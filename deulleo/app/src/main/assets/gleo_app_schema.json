@@ -1,0 +1,47 @@
+{
+  "packageName": "ai.deulleo.app",
+  "appDescription": "An in-car errand agent that plans today's errands into one route with shops, order, time and parking.",
+  "invokeWord": "들러",
+  "version": "0.1.0",
+  "actionCalls": [
+    {
+      "type": "function",
+      "function": {
+        "name": "PLAN_TODAY_ROUTE",
+        "description": "Plan today's schedules and errands into a single driving route and brief the driver.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "homeBy": { "type": "string", "description": "Time the driver wants to be home, in HH:mm format. Optional." }
+          },
+          "required": []
+        },
+        "component": "activity"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "ADD_ERRAND",
+        "description": "Add an errand such as buying an item or visiting a kind of shop to today's route and re-plan it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "item": { "type": "string", "description": "Item to buy or kind of place to visit, e.g. cake, flowers, pharmacy." }
+          },
+          "required": ["item"]
+        },
+        "component": "service"
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "GET_NEXT_STOP",
+        "description": "Tell the driver the next stop of today's route and the expected arrival time.",
+        "parameters": { "type": "object", "properties": {}, "required": [] },
+        "component": "service"
+      }
+    }
+  ]
+}

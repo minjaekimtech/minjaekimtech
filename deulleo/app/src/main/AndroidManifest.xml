@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Vehicle SDK: 조회(get) 위주, 제어는 공조(HVAC)만 -->
+    <uses-permission android:name="pleos.car.permission.CAR_DRIVE" />        <!-- Gear -->
+    <uses-permission android:name="pleos.car.permission.CAR_ENERGY" />       <!-- Fuel, EvBattery -->
+    <uses-permission android:name="pleos.car.permission.CAR_SAFETY" />       <!-- Safety(경고등), Tire -->
+    <uses-permission android:name="pleos.car.permission.CAR_DOORS" />        <!-- 트렁크 열림 -->
+    <uses-permission android:name="pleos.car.permission.CAR_CLIMATE" />      <!-- 실내 온도 조회 -->
+    <uses-permission android:name="pleos.car.permission.CONTROL_CAR_CLIMATE" /> <!-- 실내 온도 설정 -->
+
+    <!-- NaviHelper SDK -->
+    <uses-permission android:name="pleos.car.permission.NAVI_ROUTE" />
+    <uses-permission android:name="pleos.car.permission.NAVI_ROUTE_SEARCH" />
+
+    <!-- 음성 -->
+    <uses-permission android:name="pleos.car.permission.STT_SERVICE" />
+    <uses-permission android:name="pleos.car.permission.TTS_SERVICE" />
+
+    <!-- 위치 (dangerous: 런타임 요청 필요) -->
+    <uses-permission android:name="pleos.car.permission.FUSED_LOCATION" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@android:drawable/ic_dialog_map"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.NoActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- 주행 중에도 표시되는 화면(주행 모드는 정보 3개·음성 우선으로 설계) -->
+            <meta-data
+                android:name="distractionOptimized"
+                android:value="true" />
+        </activity>
+    </application>
+</manifest>
