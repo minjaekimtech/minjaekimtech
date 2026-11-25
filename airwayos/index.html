@@ -684,10 +684,17 @@ const notesEl = document.getElementById('notes');
 const gotoEl = document.getElementById('goto');
 const tapEl = document.getElementById('tap');
 let cur = -1, digits = '', idleT, remote = false;
+const RELAY = 'https://ntfy.sh/airwayos-f486f08f2ab54494';
+const SID = Math.random().toString(36).slice(2);
+function relaySend(d) { try { d.sid = SID; fetch(RELAY, { method: 'POST', body: JSON.stringify(d) }).catch(() => {}); } catch (e) {} }
+function relayListen(onMsg, onState) { let es; try { es = new EventSource(RELAY + '/sse'); } catch (e) { onState && onState('off'); return; }
+  es.onopen = () => onState && onState('on'); es.onerror = () => onState && onState('retry');
+  es.onmessage = e => { try { const m = JSON.parse(e.data); if (m.event && m.event !== 'message') return; const d = JSON.parse(m.message); if (d.sid === SID) return; onMsg(d); } catch (x) {} }; }
 const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('airwayos-sync') : null;
-function announce(i) { if (remote) return; try { bc && bc.postMessage({ i, from: 'main' }); } catch (e) {} try { localStorage.setItem('airwayos-slide', JSON.stringify({ i, t: Date.now(), from: 'main' })); } catch (e) {} }
+function announce(i) { if (remote) return; relaySend({ i, from: 'main' }); try { bc && bc.postMessage({ i, from: 'main' }); } catch (e) {} try { localStorage.setItem('airwayos-slide', JSON.stringify({ i, t: Date.now(), from: 'main' })); } catch (e) {} }
 function follow(d) { if (!d || d.from === 'main' || typeof d.i !== 'number' || d.i === cur) return; remote = true; go(d.i); remote = false; }
 if (bc) bc.onmessage = e => follow(e.data);
+relayListen(follow);
 addEventListener('storage', e => { if (e.key === 'airwayos-slide' && e.newValue) { try { follow(JSON.parse(e.newValue)); } catch (x) {} } });
 function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); stage.style.transform = `translate(-50%,-50%) scale(${s})`; }
 addEventListener('resize', fit); fit();
