@@ -683,7 +683,12 @@ const notes = JSON.parse(document.getElementById('notes-data').textContent);
 const notesEl = document.getElementById('notes');
 const gotoEl = document.getElementById('goto');
 const tapEl = document.getElementById('tap');
-let cur = -1, digits = '', idleT;
+let cur = -1, digits = '', idleT, remote = false;
+const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('airwayos-sync') : null;
+function announce(i) { if (remote) return; try { bc && bc.postMessage({ i, from: 'main' }); } catch (e) {} try { localStorage.setItem('airwayos-slide', JSON.stringify({ i, t: Date.now(), from: 'main' })); } catch (e) {} }
+function follow(d) { if (!d || d.from === 'main' || typeof d.i !== 'number' || d.i === cur) return; remote = true; go(d.i); remote = false; }
+if (bc) bc.onmessage = e => follow(e.data);
+addEventListener('storage', e => { if (e.key === 'airwayos-slide' && e.newValue) { try { follow(JSON.parse(e.newValue)); } catch (x) {} } });
 function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); stage.style.transform = `translate(-50%,-50%) scale(${s})`; }
 addEventListener('resize', fit); fit();
 function playVideos(sec) {
@@ -704,7 +709,7 @@ function go(i) {
   if (prev) { prev.querySelectorAll('video').forEach(v => v.pause()); }
   if (prev && !magic) { prev.classList.add('out'); setTimeout(() => prev.classList.remove('out'), 420); }
   next.classList.add('on'); if (prev && !magic) next.classList.add('fadein');
-  cur = i; history.replaceState(null, '', '#' + (i + 1));
+  cur = i; history.replaceState(null, '', '#' + (i + 1)); announce(i);
   playVideos(next);
   notesEl.innerHTML = '<b>' + (i + 1) + ' / ' + slides.length + '</b>' + (notes[i] || '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
 }

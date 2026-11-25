@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AirwayOS — Presenter</title>
+<link rel="stylesheet" href="fonts.css?v=1c31df77"><link rel="stylesheet" href="deck.css?v=1c31df77">
+<style>
+* { margin:0; box-sizing:border-box }
+html,body { height:100%; background:#0b0c0f; color:#e5e5ea; overflow:hidden; font-family:'Inter','Apple SD Gothic Neo','Malgun Gothic',sans-serif }
+#top { display:flex; align-items:center; gap:24px; padding:14px 28px; border-bottom:1px solid #22242a; font:600 20px/1.2 'Inter',sans-serif }
+#num { color:#6CB4FF; font:700 26px 'JetBrains Mono',monospace }
+#ttl { flex:1; color:#f5f5f7; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+#tm { color:#8e8e93; font:500 20px 'JetBrains Mono',monospace }
+#timer { color:#f5f5f7; font:700 30px 'JetBrains Mono',monospace; min-width:110px; text-align:right }
+#main { display:grid; grid-template-columns: minmax(0,1fr) 30vw; gap:28px; height:calc(100% - 64px - 40px); padding:24px 28px 0 }
+#script { overflow-y:auto; padding-right:12px; padding-bottom:56px }
+#script.long p.l { font-size:calc(var(--fs,44px) * .78) }
+#script p.l { font-size:var(--fs,44px); line-height:1.42; color:#b9bac0; font-weight:500; margin:0 0 .32em 0; letter-spacing:-.2px }
+#script p.l b { color:#ffffff; font-weight:800 }
+#script p.l i { color:#FFB86B; font-style:normal; font-size:.62em; font-weight:600 }
+#script p.ko { display:none; margin-top:.8em; font-size:calc(var(--fs,44px) * .5); line-height:1.5; color:#8e8e93 }
+body.showko #script p.ko { display:block }
+#side { display:flex; flex-direction:column; gap:14px; min-width:0 }
+.lab { font:700 14px 'JetBrains Mono',monospace; letter-spacing:2px; color:#6e7076 }
+.tb { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; border-radius:10px; background:#000; border:1px solid #2a2d33 }
+.tb.next { width:70%; opacity:.85 }
+.tb .stage { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0 }
+.tb .stage > section { position:absolute !important; left:0 !important; top:0 !important; width:1920px !important; height:1080px !important; overflow:hidden !important; box-sizing:border-box !important; display:none; margin:0 !important }
+.tb .stage > section.on { display:block }
+.tb .stage aside { display:none !important }
+.tb .stage div.pg::before { content: attr(data-n) !important }
+#hint { position:fixed; left:0; right:0; bottom:0; height:40px; display:flex; align-items:center; gap:22px; padding:0 28px; border-top:1px solid #22242a; font:500 15px 'JetBrains Mono',monospace; color:#6e7076 }
+#hint b { color:#a8a8ae }
+#goto { position:fixed; right:28px; top:70px; font:700 28px 'JetBrains Mono',monospace; color:#6CB4FF; background:#000c; padding:6px 14px; border-radius:10px; display:none }
+</style></head><body>
+<div id="top"><span id="num"></span><span id="ttl"></span><span id="tm"></span><span id="timer">00:00</span></div>
+<div id="main"><div id="script"></div>
+<div id="side"><p class="lab">NOW</p><div class="tb" id="tbNow"><div class="stage"><section id="cover" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/13d0bb2cba8efdf26457d4ba1dcf59b4.png" alt="Concept render: the thin round white wearable in front of a tilted phone showing the AirwayOS morning report, on a dark background." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div class="rise" style="--i:1; position:absolute; left:128px; top:300px; width:980px; display:flex; align-items:center; gap:30px">
+<img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:184px; height:120px">
+<p style="margin:0; font-size:140px; font-weight:800; letter-spacing:-5px; line-height:1.0; color:#F5F5F7">AirwayOS</p>
+</div>
+<p class="rise" style="--i:2; position:absolute; left:128px; top:500px; width:980px; margin:0; font-size:64px; font-weight:700; letter-spacing:-1.5px; line-height:1.15; color:#F5F5F7">Turn over. <span style="color:#6CB4FF">Sleep easy.</span></p>
+<p style="position:absolute; left:128px; top:640px; width:900px; margin:0; font-size:30px; line-height:1.3; color:#A8A8AE">Jefferey Kim · Founder</p>
+
+</section>
+<section id="hook" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img class="" style="display:block; width:1920px; height:1080px; object-fit:cover" src="assets/bb722172c076a1e4d2cbca4b7a4666ca.jpg" alt="">
+<div style="position:absolute; right:72px; bottom:52px; width:300px; height:44px; display:flex; align-items:center; justify-content:flex-end; gap:12px; opacity:0.9"><img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:52px; height:34px"><p style="margin:0; font-size:28px; font-weight:800; letter-spacing:-0.5px; color:#F5F5F7">AirwayOS</p></div>
+
+</section>
+<section id="language" class="night foot" data-transition="fade">
+<p class="eyebrow">WHAT YOU JUST HEARD</p>
+<h2 class="t" style="margin:0px">A man who <ruby>stopped breathing<rt>숨이 멈춘</rt></ruby>.</h2>
+<p class="rec" style="position:absolute; left:128px; top:336px; width:600px"><span style="color:#FF6A55">●</span> REC · 2:47 AM</p>
+<img src="assets/127fb61fff9e0f4595bc015c03676df3.png" alt="Sound recording of a sleeper: loud snores, then about ten seconds of silence, then a sharp gasp, then quieter breathing" style="position:absolute; left:128px; top:384px; width:1664px; height:360px">
+<div class="wipe" style="position:absolute; left:120px; top:380px; width:1680px; height:368px"></div>
+<p class="rec fade" style="--d:1300ms; position:absolute; left:859px; top:512px; width:608px; text-align:center; color:#FF9A6A">10 SEC · NO BREATH</p>
+<p class="wl fade" style="--d:600ms; left:128px; top:776px; width:700px"><ruby>Snoring<rt>코골이</rt></ruby></p>
+<p class="wl hot fade" style="--d:1300ms; left:859px; top:776px; width:560px"><ruby>Silence<rt>무호흡</rt></ruby>: airway blocked</p>
+<p class="wl ok fade" style="--d:1900ms; left:1436px; top:776px; width:400px"><ruby>Gasp<rt>헉 (다시 숨)</rt></ruby>: forced to breathe</p>
+<p class="lead fade" style="--d:2300ms; position:absolute; left:128px; top:856px; width:1200px; color:#F5F5F7">Again and again, all night long.</p>
+<div class="pg" data-n="3"></div>
+
+</section>
+<section id="danger" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/c1083613bfacd1acf42deac3624a5d16.jpg" alt="Three panels: a brain scan with a marked lesion, a tired man at the wheel at night, and a crashed car at a roadside." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<p style="position:absolute; left:72px; top:56px; margin:0; font-size:88px; font-weight:900; letter-spacing:-1px; line-height:1.1; color:#F5F5F7">IT’S NOT JUST <span style="background:#E4F07A; color:#141417; padding:0px 18px">NOISE</span></p>
+<div style="position:absolute; left:56px; top:690px; width:540px">
+<p style="margin:0; font-size:24px; font-weight:700; letter-spacing:4px; color:#E4F07A">BRAIN</p>
+<p style="margin:6px 0 0 0; font-size:136px; font-weight:800; letter-spacing:-3px; line-height:1.05; color:#F5F5F7">2×</p>
+<p style="margin:10px 0 0 0; font-size:30px; line-height:1.3; color:#C7C7CC"><ruby>stroke<rt>뇌졸중</rt></ruby> risk with serious <ruby>sleep apnea<rt>수면무호흡</rt></ruby></p>
+</div>
+<div style="position:absolute; left:696px; top:690px; width:540px">
+<p style="margin:0; font-size:24px; font-weight:700; letter-spacing:4px; color:#E4F07A">BEHIND THE WHEEL</p>
+<p style="margin:6px 0 0 0; font-size:136px; font-weight:800; letter-spacing:-3px; line-height:1.05; color:#F5F5F7">2.4×</p>
+<p style="margin:10px 0 0 0; font-size:30px; line-height:1.3; color:#C7C7CC">car crash risk with sleep apnea</p>
+</div>
+<div style="position:absolute; left:1336px; top:690px; width:540px">
+<p style="margin:0; font-size:24px; font-weight:700; letter-spacing:4px; color:#E4F07A">ROAD · USA</p>
+<p style="margin:6px 0 0 0; font-size:136px; font-weight:800; letter-spacing:-3px; line-height:1.05; color:#F5F5F7">91,000</p>
+<p style="margin:10px 0 0 0; font-size:30px; line-height:1.3; color:#C7C7CC">crashes a year with a <ruby>drowsy driver<rt>졸음운전</rt></ruby>, one every 6 minutes</p>
+</div>
+
+</section>
+<section id="scale" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/78b8e167c407a43f113e4dd8a0beb356.jpg" alt="World map centered on the Americas, other continents faint. The United States is covered in 150 dots, each 200,000 people with sleep apnea. Only one dot in five is lit; the rest are dark." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div style="position:absolute; left:72px; top:700px; width:900px">
+<p style="margin:0 0 14px 0; font-size:18px; font-weight:700; letter-spacing:4px; line-height:1.3; color:#A8A8AE">1 DOT = 200,000 AMERICANS WITH <ruby>SLEEP APNEA<rt>수면무호흡</rt></ruby></p>
+<p style="margin:0; font-size:24px; line-height:1.2; color:#F5F5F7"><span style="display:inline-block; width:16px; height:16px; border-radius:50%; background:#F4F9C4; box-shadow:0 0 0 3px #141417, 0 0 0 5px #E4F07A, 0 0 16px 6px rgba(228,240,122,0.45); margin:0 16px 0 4px; vertical-align:-1px"></span>knows<span style="display:inline-block; width:16px; height:16px; border-radius:50%; background:#6B7078; box-shadow:0 0 0 3px #3E4148; margin:0 16px 0 44px; vertical-align:-1px"></span><span style="color:#A8A8AE">doesn’t know</span></p>
+</div>
+<p style="position:absolute; left:72px; top:820px; width:900px; margin:0; font-size:64px; font-weight:800; letter-spacing:-1.5px; line-height:1.08; color:#F5F5F7">30 million Americans.<br><span style="font-family:'Instrument Serif', Georgia, 'Times New Roman', serif; font-style:italic; font-weight:400; letter-spacing:0px; font-size:72px; color:#E4F07A">Far more common.</span></p>
+<div style="position:absolute; right:72px; top:812px; display:flex; gap:56px">
+<div><p style="margin:0; font-size:96px; font-weight:800; letter-spacing:-3px; line-height:1.0; color:#E4F07A">80%</p><p style="margin:14px 0 0 0; font-size:18px; font-weight:600; letter-spacing:4px; line-height:1.4; color:#C7C7CC"><ruby>NEVER DIAGNOSED<rt>진단 안 받음</rt></ruby></p></div>
+<div><p style="margin:0; font-size:96px; font-weight:800; letter-spacing:-3px; line-height:1.0; color:#E4F07A">29%</p><p style="margin:14px 0 0 0; font-size:18px; font-weight:600; letter-spacing:4px; line-height:1.4; color:#C7C7CC">SLEEP APART<br>FROM PARTNER</p></div>
+<div><p style="margin:0; font-size:96px; font-weight:800; letter-spacing:-3px; line-height:1.0; color:#E4F07A">$170M</p><p style="margin:14px 0 0 0; font-size:18px; font-weight:600; letter-spacing:4px; line-height:1.4; color:#C7C7CC">FIRST TARGET:<br>US <ruby>POSITIONAL THERAPY<rt>체위 치료</rt></ruby></p></div>
+</div>
+
+</section>
+<section id="measure" class="night" data-transition="magic" style="padding:0px; position:relative">
+<img src="assets/38b89c7cb9daad99185b8cfd2a402984.jpg" alt="A woman asleep in a sleep lab, wires taped to her face and head, a recorder on the bed beside her." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
+<div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
+<div id="fl-lead" class="fl-seg path fl-draw" style="left:0px; width:128px"></div>
+<div id="fl-g1" class="fl-node ghost" style="left:128px"></div>
+<div id="fl-g2" class="fl-node ghost" style="left:848px"></div>
+<div id="fl-g3" class="fl-node ghost" style="left:1568px"></div>
+<div id="fl-n1" class="fl-node bad fl-pop" style="left:128px; --d:700ms"><p class="fl-x">×</p></div>
+<p id="fl-l1" class="fl-lab bad" style="left:180px; width:200px">FIND OUT</p>
+<p id="fl-l2" class="fl-lab" style="left:900px; width:140px">TREAT</p>
+<p id="fl-l3" class="fl-lab" style="left:1620px; width:120px">TURN</p>
+<h2 class="t" style="position:absolute; left:128px; top:128px; width:900px; margin:0px">Barrier 1: <ruby>diagnosis<rt>진단</rt></ruby>.</h2>
+<div class="bad-rows" style="position:absolute; left:128px; top:300px">
+<div class="rise" style="--i:2"><p class="bnum">1 night</p><p class="bcap">in a sleep lab, covered in wires,<br>with a stranger watching</p></div>
+<div class="rise" style="--i:3"><p class="bnum">$3,000</p><p class="bcap">on average, without insurance</p></div>
+<div class="rise" style="--i:4"><p class="bnum">Up to half</p><p class="bcap">of patients: wrong from a single night</p></div>
+</div>
+<div style="position:absolute; left:1072px; top:852px; width:720px; box-sizing:border-box; padding:18px 22px; border-radius:14px; background:rgba(17,17,20,0.78)">
+<p style="margin:0 0 6px 0;font-weight:700;letter-spacing:4px;line-height:1.2;color:#F5F5F7;font-size:30px" data-fit="grow"><span style="color:#FF6A55">●</span>&#160;&#160;<ruby>IN-LAB SLEEP TEST<rt>수면다원검사</rt></ruby></p>
+<p style="margin:0; font-size:24px; line-height:1.3; color:#C7C7CC">polysomnography · wires on the head, face and chest</p>
+</div>
+<div class="pg" data-n="6"></div>
+
+</section>
+<section id="prevent" class="night foot" data-transition="magic">
+<div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
+<div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
+<div id="fl-lead" class="fl-seg path" style="left:0px; width:128px"></div>
+<div id="fl-s1" class="fl-seg path fl-draw" style="left:350px; width:498px; --d:200ms"></div>
+<div id="fl-g1" class="fl-node ghost" style="left:128px"></div>
+<div id="fl-g2" class="fl-node ghost" style="left:848px"></div>
+<div id="fl-g3" class="fl-node ghost" style="left:1568px"></div>
+<div id="fl-n1" class="fl-node bad" style="left:128px"><p class="fl-x">×</p></div>
+<div id="fl-n2" class="fl-node bad fl-pop" style="left:848px; --d:950ms"><p class="fl-x">×</p></div>
+<p id="fl-l1" class="fl-lab bad" style="left:180px; width:200px">FIND OUT</p>
+<p id="fl-l2" class="fl-lab bad" style="left:900px; width:140px">TREAT</p>
+<p id="fl-l3" class="fl-lab" style="left:1620px; width:120px">TURN</p>
+<h2 class="t" style="margin:0 0 48px 0">Barrier 2: <ruby>treatment<rt>치료</rt></ruby>.</h2>
+<div class="bcards">
+<div class="bcard rise" style="--i:2"><img class="bimg" src="assets/3f2abb587b76d3ebbc4d281d764a41d4.jpg" alt="A woman lies in bed at night wearing a CPAP mask over her nose and mouth."><p class="bnum2">$600+</p><p class="bcap">for a <ruby>CPAP<rt>양압기</rt></ruby> machine,<br>worn every single night</p></div>
+<div class="bcard rise" style="--i:3"><img class="bimg" src="assets/b69ae0afd919f404e3ba0f7066e6bb98.jpg" alt="A tired man in bed rubs his forehead, holding his CPAP mask away from his face."><p class="bnum2">1 in 3</p><p class="bcap">don’t use it enough</p></div>
+<div class="bcard rise" style="--i:4"><img class="bimg" src="assets/21de97e1526f8635d8a18021e0229336.jpg" alt="Medical illustration: a needle tool reaches into the soft palate at the back of the mouth."><p class="bnum2">$30,000+</p><p class="bcap">for surgery.<br>Not for everyone.</p></div>
+</div>
+<div class="pg" data-n="7"></div>
+
+</section>
+<section id="position" class="night foot" data-transition="magic">
+<div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
+<div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
+<div id="fl-lead" class="fl-seg path" style="left:0px; width:128px"></div>
+<div id="fl-s1" class="fl-seg path" style="left:350px; width:498px"></div>
+<div id="fl-s2" class="fl-seg good fl-draw" style="left:1016px; width:330px; --d:300ms"></div>
+<div id="fl-g1" class="fl-node ghost" style="left:128px"></div>
+<div id="fl-g2" class="fl-node ghost" style="left:848px"></div>
+<div id="fl-g3" class="fl-node ghost" style="left:1568px"></div>
+<div id="fl-n1" class="fl-node bad" style="left:128px"><p class="fl-x">×</p></div>
+<div id="fl-n2" class="fl-node bad" style="left:848px"><p class="fl-x">×</p></div>
+<p id="fl-l1" class="fl-lab bad" style="left:180px; width:200px">FIND OUT</p>
+<p id="fl-l2" class="fl-lab bad" style="left:900px; width:140px">TREAT</p>
+<p id="fl-l3" class="fl-lab" style="left:1620px; width:120px">TURN</p>
+<h2 class="t" style="margin:0 0 14px 0">For more than half, it’s how they sleep.</h2>
+<p style="margin:0 0 28px 0; font-size:32px; font-weight:500; line-height:1.3; color:#6CB4FF">The good news: many may not need a mask or surgery.</p>
+<div style="display:flex; gap:64px">
+<div class="rise" style="--i:2; position:relative; width:800px; height:570px; border-radius:24px; overflow:hidden">
+<img src="assets/2b9a142e3fbb93cbf6c38c3b97d96286.jpg" alt="A man sleeps on his back. Zoomed in: his tongue falls back and the airway in his throat narrows; a wavy line shows snoring." style="display:block; width:800px; height:570px; object-fit:cover">
+<p style="position:absolute; left:40px; top:28px; width:400px; margin:0; font-size:24px; font-weight:700; letter-spacing:4px; line-height:1.2; color:#E5483A">ON YOUR BACK</p>
+<p style="position:absolute; left:40px; top:272px; width:360px; margin:0; font-size:64px; font-weight:800; letter-spacing:-2px; line-height:1.0; color:#E5483A">Narrow</p>
+<p style="position:absolute; left:40px; top:352px; width:360px; margin:0; font-size:28px; line-height:1.35; color:#3A3A3C">The tongue falls back and blocks the airway.</p>
+</div>
+<div class="rise" style="--i:3; position:relative; width:800px; height:570px; border-radius:24px; overflow:hidden">
+<img src="assets/71d10cda203ca57a0b09cf071f00f4a1.jpg" alt="A man sleeps on his side. Zoomed in: the airway in his throat stays open." style="display:block; width:800px; height:570px; object-fit:cover">
+<p style="position:absolute; left:40px; top:28px; width:400px; margin:0; font-size:24px; font-weight:700; letter-spacing:4px; line-height:1.2; color:#0066CC">ON YOUR SIDE</p>
+<p style="position:absolute; left:40px; top:272px; width:360px; margin:0; font-size:64px; font-weight:800; letter-spacing:-2px; line-height:1.0; color:#0066CC">Open</p>
+<p style="position:absolute; left:40px; top:352px; width:360px; margin:0; font-size:28px; line-height:1.35; color:#3A3A3C">The airway stays open.</p>
+<p style="position:absolute; left:40px; top:440px; width:360px; margin:0; font-size:28px; font-weight:700; line-height:1.35; color:#0066CC">−54% breathing problems</p>
+</div>
+</div>
+<p style="margin:30px 0 0 0; font-size:40px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; color:#F5F5F7">The catch? You can’t control your position in your sleep.</p>
+<div class="pg" data-n="8"></div>
+
+</section>
+<section id="turn" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/9dc25377728f1ca6f276ec11cd5d4d19.png" alt="Concept render: a thin, round white wearable with a small blue light, on a clear round skin patch, lit dramatically on a dark background." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
+<div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
+<div id="fl-lead" class="fl-seg path" style="left:0px; width:128px"></div>
+<div id="fl-s1" class="fl-seg path" style="left:350px; width:498px"></div>
+<div id="fl-s2" class="fl-seg good" style="left:1016px; width:552px"></div>
+<div id="fl-g1" class="fl-node ghost" style="left:128px"></div>
+<div id="fl-g2" class="fl-node ghost" style="left:848px"></div>
+<div id="fl-g3" class="fl-node ghost" style="left:1568px"></div>
+<div id="fl-n1" class="fl-node bad" style="left:128px"><p class="fl-x">×</p></div>
+<div id="fl-n2" class="fl-node bad" style="left:848px"><p class="fl-x">×</p></div>
+<div id="fl-n3" class="fl-node good fl-pop" style="left:1568px; --d:700ms"><p class="fl-x">✓</p></div>
+<p id="fl-l1" class="fl-lab bad" style="left:180px; width:200px">FIND OUT</p>
+<p id="fl-l2" class="fl-lab bad" style="left:900px; width:140px">TREAT</p>
+<p id="fl-l3" class="fl-lab good" style="left:1620px; width:120px">TURN</p>
+<img class="rise" src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="--i:1; position:absolute; left:128px; top:186px; width:138px; height:90px">
+<p class="rise" style="--i:1; position:absolute; left:290px; top:170px; width:800px; margin:0; font-size:120px; font-weight:300; letter-spacing:-3px; line-height:1.0; color:#F5F5F7">AirwayOS</p>
+<p class="rise" style="--i:2; position:absolute; left:116px; top:290px; width:1000px; margin:0; font-size:136px; font-weight:800; font-style:italic; letter-spacing:-5px; line-height:1.05; color:#F5F5F7">Sleep Patch.</p>
+<p class="rise" style="--i:3; position:absolute; left:128px; top:452px; width:900px; margin:0; font-size:36px; font-weight:500; line-height:1.25; color:#C7C7CC">So we built this: <b style="color:#F5F5F7">a thin patch for your shoulder.</b></p>
+<div class="steps9 rise" style="--i:4; position:absolute; left:128px; top:548px; width:900px">
+<div class="st9"><p class="st9n">1</p><svg width="44" height="44" viewBox="0 0 44 44" aria-label="sound wave icon"><path d="M6 22v0M12 16v12M18 10v24M24 14v16M30 8v28M36 17v10" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="st9t">Your phone <b>listens for snoring.</b></p></div></div>
+<div class="st9"><p class="st9n">2</p><svg width="44" height="44" viewBox="0 0 44 44" aria-label="lying on the back icon"><path d="M6 26c4-7 28-7 32 0" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 30h36" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="st9t">The patch <b>senses when you’re on your back.</b></p></div></div>
+<div class="st9"><p class="st9n">3</p><svg width="44" height="44" viewBox="0 0 44 44" aria-label="vibration icon"><circle cx="22" cy="22" r="5" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14a13 13 0 0 0 0 16M32 14a13 13 0 0 1 0 16M6 9a21 21 0 0 0 0 26M38 9a21 21 0 0 1 0 26" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="st9t">Both? <b>Only then</b>, a <ruby>gentle buzz<rt>약한 진동</rt></ruby>.</p></div></div>
+<div class="st9"><p class="st9n">4</p><svg width="44" height="44" viewBox="0 0 44 44" aria-label="roll over icon"><path d="M34 16a13 13 0 1 0 2 9" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 8v8h-8" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="st9t">You <b>roll over</b> and keep sleeping.</p></div></div>
+</div>
+
+</section>
+<section id="learns" class="night foot" data-transition="fade">
+<img src="assets/6a381d5c2439d937c87b95c9b4603dc9.png" alt="" style="position:absolute; left:1100px; top:0px; width:820px; height:1080px">
+<p class="eyebrow">NEW VALUE</p>
+<h2 class="t">It learns you.</h2>
+<div class="row" style="gap:56px; align-items:center; position:relative">
+<div class="col" style="flex:1; gap:20px">
+<div class="stepc rise" style="--i:0"><p class="sn">1</p><div><p class="sk">WEEK 1</p><p class="st2">Only measures. Builds your <ruby>baseline<rt>기준치</rt></ruby>.</p></div></div>
+<div class="stepc hl rise" style="--i:1"><p class="sn">2</p><div><p class="sk">WEEK 2+</p><p class="st2">Finds the softest <ruby>buzz<rt>진동</rt></ruby> that still works.</p></div></div>
+<div class="stepc rise" style="--i:2"><p class="sn">3</p><div><p class="sk">EVERY MORNING</p><p class="st2">Shows the proof: buzzes, turns, less snoring.</p></div></div>
+<div class="strip" style="margin-top:8px"><p class="stript">Watches and apps report the problem tomorrow. Our patch acts on it tonight.</p></div>
+</div>
+<div class="col" style="gap:10px; align-items:center"><img class="rise" style="--i:3; width:311px; height:650px; object-fit:contain" src="assets/0324aff02ce23f9c597ee7ba172e995b.png" alt="App screen, morning report: a timeline of last night shows short snoring bursts while on the back, each ended by a buzz and a turn to the side; quiet score 82, 6 buzzes, turned over 5 of 6; softest buzz level 2 of 5."></div>
+</div>
+<div class="pg" data-n="10"></div>
+
+</section>
+<section id="demo" class="night foot" data-transition="fade">
+<p class="eyebrow">DEMO</p>
+<h2 class="t" style="margin:0 0 40px 0">One night, one soft buzz.</h2>
+<div class="row" style="gap:64px; align-items:flex-start">
+<img class="dm rise" style="--i:0" src="assets/eb4e95fde61d80b6d53f2339088b9a83.jpg" alt="">
+<div class="dms" style="width:480px; gap:18px; padding:0px">
+<div class="dmt-row rise" style="--i:1"><img class="dmth" src="assets/8673550debc833f525b0c69405b59547.jpg" alt="Scene: he puts the patch on the back of his shoulder"><div><p class="dmt">0:00</p><p class="dml2">Patch on</p></div></div>
+<div class="dmt-row rise" style="--i:2"><img class="dmth hot" src="assets/b9c651517ce973c57bbcc7d8ecf80312.jpg" alt="Scene: he snores on his back while his partner covers her ear"><div><p class="dmt">0:01</p><p class="dml2 hot">On his back. Snoring.</p></div></div>
+<div class="dmt-row rise" style="--i:3"><img class="dmth ok" src="assets/45e27f32224626c1178a37a67b591bb9.jpg" alt="Scene: a soft blue glow under his shoulder as the patch buzzes"><div><p class="dmt">0:04</p><p class="dml2 ok">Gentle buzz</p></div></div>
+<div class="dmt-row rise" style="--i:4"><img class="dmth ok" src="assets/395ee482bbdd96dd3e5a17b109dc704a.jpg" alt="Scene: he rolls onto his side, still asleep"><div><p class="dmt">0:05</p><p class="dml2 ok">Rolls over</p></div></div>
+<div class="dmt-row rise" style="--i:5"><img class="dmth" src="assets/68fd1e06dc16d3e95cdb2157174dcb26.jpg" alt="Scene: both asleep, his partner relaxed"><div><p class="dmt">0:10</p><p class="dml2">Snoring stops. Still asleep.</p></div></div>
+</div>
+</div>
+<div class="pg" data-n="11"></div>
+
+</section>
+<section id="compete" class="night foot" data-transition="fade">
+<p class="eyebrow">COMPETITIVE ADVANTAGE</p>
+<h2 class="t" style="margin:0 0 40px 0">Easy and effective, every night.</h2>
+<div class="qd">
+<div class="qz fade" style="--d:900ms"></div>
+<div class="qx"></div>
+<div class="qy"></div>
+<p class="qax" style="left:20px;top:10px;width:560px;text-align:right;transform:translate(-608px, -10px)">↑&nbsp;<br>WORKS<br>(REAL-LIFE<br>EFFECT)</p>
+<p class="qax" style="left:1060px;top:536px;width:480px;text-align:right;transform:translate(20px, 64px)">EASY TO USE EVERY NIGHT →</p>
+<p class="qax go fade" style="--d:900ms; left:1240px; top:16px; width:300px; text-align:right">OUR TARGET</p>
+<p class="qdot" style="--d:150ms; left:125px; top:190px"><ruby>Surgery<rt>수술</rt></ruby></p>
+<p class="qdot" style="--d:250ms; left:245px; top:262px"><ruby>CPAP mask<rt>양압기</rt></ruby></p>
+<p class="qdot" style="--d:350ms; left:470px; top:150px"><ruby>Dental device<rt>구강 장치</rt></ruby></p>
+<p class="qdot" style="--d:450ms; left:735px; top:95px"><ruby>Prescription trainers<rt>처방 자세교정기</rt></ruby></p>
+<p class="qdot" style="--d:550ms; left:990px; top:345px">Smart pillows</p>
+<p class="qdot" style="--d:650ms; left:1320px; top:470px">Apps &amp; watches</p>
+<p class="qdot" style="--d:750ms; left:190px; top:500px">Live with it</p>
+<div class="qus" style="left:1290px; top:150px"><img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:62px; height:40px"><p class="qust">AirwayOS</p></div>
+</div>
+<div class="pg" data-n="12"></div>
+
+</section>
+<section id="model" class="night foot" data-transition="fade">
+<p class="eyebrow">BUSINESS MODEL</p>
+<h2 class="t" style="margin:0 0 40px 0">Our business model is straightforward.</h2>
+<div class="bm">
+<div class="bmt hl rise" style="--i:1; width:900px">
+<img class="bmi" src="assets/0fd5cebf9d3d6cab7a17c37f1cf98726.png" alt="Concept render: the round patch device with two spare pads">
+<p class="bmk">① THE KIT</p>
+<p class="bmh">₩99,000 <span class="bmu">~$69</span></p>
+<p class="bmc">with a one-week trial</p>
+</div>
+<p class="bma">→</p>
+<div class="bmt rise" style="--i:2; width:716px">
+<img class="bmi" src="assets/ccc90ad29fcb6c90293ca691762c6ebf.png" alt="Concept render: a fan of refill pads">
+<p class="bmk">② THEN</p>
+<p class="bmh">₩4,900<span class="bmu"> / month</span></p>
+<p class="bmc">for replacement pads</p>
+</div>
+</div>
+<p class="uek" style="margin-top:44px">③ WITH A 55% <ruby>GROSS MARGIN<rt>매출총이익</rt></ruby> · PER KIT</p>
+<div class="ueb">
+<div class="ues dev" style="width:421px; --d:500ms"><p class="uel">DEVICE</p><p class="uev">₩25,000</p></div>
+<div class="ues ops" style="width:336px; --d:800ms"><p class="uel">FEES &amp; SHIPPING</p><p class="uev">₩20,000</p></div>
+<div class="ues con" style="width:907px; --d:1100ms"><p class="uel">GROSS MARGIN · 55%</p><p class="uev">₩54,000</p></div>
+</div>
+<div class="cac rise" style="--i:14">
+<div class="cacb"><p class="cact"><ruby>CUSTOMER COST<rt>고객 획득 비용</rt></ruby> ≤ ₩25,000</p></div>
+<p class="cacr">✓ The very first sale pays it back</p>
+</div>
+<div class="pg" data-n="13"></div>
+
+</section>
+<section id="team" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/52fb4ccf1f563e7bfe0ec479efceac2a.jpg" alt="Jefferey Kim pitching on stage at MIT Global Startup Workshop 2026." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<p style="position:absolute;left:128px;top:100px;width:600px;margin:0;font-weight:700;letter-spacing:4px;color:#E4F07A;font-size:30px">WHY ME</p>
+<p class="rise" style="--i:1; position:absolute; left:128px; top:140px; width:820px; margin:0; font-size:60px; font-weight:800; letter-spacing:-1.5px; line-height:1.1; color:#F5F5F7">I live with this problem.<br>I build products people use.</p>
+<p style="position:absolute; left:128px; top:292px; width:700px; margin:0; font-size:28px; line-height:1.3; color:#C7C7CC">Jefferey Kim · Mobile Engineering, KNU</p>
+<p class="rise" style="--i:2; position:absolute; left:128px; top:346px; width:820px; margin:0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:2px; line-height:1.2; color:#E4F07A">⚙&#160;&#160;BUILT PROTOTYPE v0.1 MYSELF · OCT 2026</p>
+<div class="rise" style="--i:2; position:absolute; left:128px; top:430px; width:640px">
+<p style="margin:0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:3px; line-height:1.2; color:#E4F07A">↗&#160;&#160;PITCHED AND WON AT</p>
+<div style="display:flex; gap:36px; align-items:center; margin-top:18px">
+<img src="assets/9555d60319b232aa9dafc891c6e997be.png" alt="MIT" style="width:75px; height:46px">
+<img src="assets/4173dab122177bd8229b2b453dae65f6.png" alt="Samsung Galaxy" style="width:106px; height:46px">
+<img src="assets/0c1eb823348bc1be3b5f927eecb851b1.png" alt="UC Berkeley" style="width:149px; height:46px">
+<img src="assets/41471f2a6409f170d746118ccca67db5.png" alt="VoiceOS" style="width:163px; height:34px">
+</div>
+<div style="margin-top:44px"><p style="margin:0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:3px; line-height:1.2; color:#E4F07A">◎&#160;&#160;DESIGN REVIEWED BY</p></div>
+<p style="margin:12px 0 0 0; font-size:36px; font-weight:800; line-height:1.2; color:#F5F5F7">Sleep researcher · KNU Hospital</p>
+</div>
+<div class="rise" style="--i:3; position:absolute; left:128px; top:822px; width:1664px; display:grid; grid-template-columns:repeat(6, 1fr); column-gap:16px">
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">MIT GSW</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">2ND · 2026</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">GALAXY<br>IDEATHON</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">2ND · SAMSUNG</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">VOICEOS<br>HACKATHON</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">3RD · SF 2026</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">MO:DEX<br>APP CONTEST</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">1ST · KNU</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">AI WORKFLOW<br>HACKATHON</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">GRAND PRIZE</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="graduation cap icon"><path d="M3 15 20 8l17 7-17 7zM10 18v8c3 3 17 3 20 0v-8M35 16v9" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">UC BERKELEY</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">SUMMER 2026</p></div>
+</div>
+
+</section>
+<section id="sv" class="night foot" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/69895ad92e928ca3d58c5f10ebeb0bbc.jpg" alt="Dotted map of the San Francisco Bay Area, with San Francisco and Stanford lit in blue." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<p class="eyebrow" style="position:absolute; left:128px; top:128px; width:900px; margin:0">IN SILICON VALLEY · JANUARY 2027</p>
+<h2 class="t" style="position:absolute; left:128px; top:176px; width:900px; margin:0">Not a trip. A test.</h2>
+<p class="rise" style="--i:0; position:absolute; left:128px; top:278px; width:780px; margin:0; font-size:28px; line-height:1.3; color:#A8A8AE"><b style="color:#F5F5F7">In Silicon Valley, I’ll <ruby>validate<rt>검증</rt></ruby> three things.</b></p>
+<div class="col" style="position:absolute; left:128px; top:370px; width:820px; gap:32px">
+<div class="svr rise" style="--i:1"><p class="svn">01</p><div><p class="svh">Will Americans pay? $69 or $89?</p><p class="svc">Waitlist page + survey of 100 people</p></div></div>
+<div class="svr rise" style="--i:2"><p class="svn">02</p><div><p class="svh">How do sleep doctors see it?</p><p class="svc">Already reached out to Stanford and UCSF</p></div></div>
+<div class="svr rise" style="--i:3"><p class="svn">03</p><div><p class="svh">Which partners can help us sell?</p><p class="svc">5 VCs · 3 medical equipment suppliers</p></div></div>
+</div>
+<div class="pin" style="left:1259px; top:360px; --d:700ms"></div>
+<p class="pinl rise" style="--i:7; left:1040px; top:300px; width:186px; text-align:right">UCSF <span>02</span></p>
+<div class="pin" style="left:1498px; top:711px; --d:900ms"></div>
+<p class="pinl rise" style="--i:8; left:1540px; top:700px; width:236px">STANFORD <span>02</span></p>
+<p class="pinl rise" style="--i:6; left:1484px; top:150px; width:300px; color:#8E8E93; font-weight:400">SAN FRANCISCO BAY</p>
+<div class="rd-track" style="left:140px; width:1640px"></div>
+<div class="rd-seg" style="left:140px; width:540px; --d:1100ms"></div>
+<div class="rd-node on" style="left:128px"></div>
+<div class="rd-node" style="left:668px"></div>
+<div class="rd-node" style="left:1208px"></div>
+<div class="rd-node" style="left:1748px"></div>
+<p class="rdl on" style="left:128px; width:460px">NOW · VALIDATE IN KOREA</p>
+<p class="rdl" style="left:668px; width:460px">2027 · US WELLNESS LAUNCH</p>
+<p class="rdl" style="left:1208px; width:300px">FDA 510(k)</p>
+<p class="rdl" style="left:1492px; width:280px; text-align:right">MEDICARE</p>
+<div class="pg" data-n="15"></div>
+
+</section>
+<section id="close" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/db1482350e6b812cde4dcf14d8e4c796.jpg" alt="Illustration: a person sleeps peacefully on their side under a starry night sky, a small patch on their upper back." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div class="rise" style="--i:0; position:absolute; left:128px; top:236px; width:600px; display:flex; align-items:center; gap:16px">
+<img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:86px; height:56px">
+<p style="margin:0; font-size:44px; font-weight:800; letter-spacing:-1px; line-height:1.0; color:#F5F5F7">AirwayOS</p>
+</div>
+<p class="rise" style="--i:1; position:absolute; left:128px; top:330px; width:900px; margin:0; font-size:120px; font-weight:800; letter-spacing:-4px; line-height:1.02; color:#F5F5F7">Turn over.<br><span style="color:#6CB4FF">Sleep easy.</span></p>
+<p class="rise" style="--i:2; position:absolute; left:128px; top:620px; width:760px; margin:0; font-size:34px; line-height:1.35; color:#D0D2E0">No one should have to choose between sleeping well and sleeping together.</p>
+
+</section>
+<section id="bk-customer" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · FIRST CUSTOMER &amp; MARKET</p>
+<h2 class="t">First customer: back-sleeping snorers in the US.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">WHO</p>
+<h3 class="ct">Snores mostly on the back</h3>
+<p class="cp">Often the partner is the one who pushes them to act.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">WHERE THEY ARE</p>
+<h3 class="ct">Not ready for a lab or CPAP</h3>
+<p class="cp">They want something easy that works tonight.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">FIRST MARKET</p>
+<h3 class="ct">$170M</h3>
+<p class="cp">US positional therapy. 30M Americans have sleep apnea; 80% are undiagnosed.</p>
+</div>
+</div>
+<p class="src">Market: Coherent MI, DelveInsight, SNS Insider (2025). Prevalence and undiagnosed share as on slide 5.</p>
+<div class="pg" data-n="17"></div>
+
+</section>
+<section id="bk-price" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · PRICING</p>
+<h2 class="t">$69: low enough to try without a doctor.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">PRESCRIPTION DEVICE</p>
+<h3 class="ct">$499</h3>
+<p class="cp">Night Shift. Needs a prescription, and you only find out if it suits you after you buy.</p>
+</div>
+<div class="card hl rise" style="--i:1; flex:1">
+<p class="tag">AIRWAYOS KIT</p>
+<h3 class="ct">$69 · ₩99,000</h3>
+<p class="cp">No prescription. One-week trial. 55% gross margin.</p>
+</div>
+<div class="card rise" style="--i:2; flex:1">
+<p class="tag">NEXT TEST</p>
+<h3 class="ct">$69 vs $89</h3>
+<p class="cp">Waitlist page and a survey of 100 people in Silicon Valley.</p>
+</div>
+</div>
+<p class="src">Night Shift price: 1800CPAP (Night Shift LE). Margin: slide 13.</p>
+<div class="pg" data-n="18"></div>
+
+</section>
+<section id="bk-us" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · WHY THE US FIRST</p>
+<h2 class="t">Bigger need in the US. Korea is the test bed.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card hl rise" style="--i:0; flex:1.3">
+<p class="tag">US · THE NEED</p>
+<h3 class="ct">30M with sleep apnea</h3>
+<p class="cp">80% undiagnosed. A sleep test costs about $3,000 without insurance.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">KOREA · NOW</p>
+<h3 class="ct">Build and validate</h3>
+<p class="cp">Prototype and first user tests here, at KNU.</p>
+</div>
+<div class="card rise" style="--i:2; flex:1">
+<p class="tag">ROADMAP</p>
+<h3 class="ct">2027 US online launch</h3>
+<p class="cp">Then FDA 510(k), then Medicare.</p>
+</div>
+</div>
+<p class="src">Sources as on slides 5 and 6.</p>
+<div class="pg" data-n="19"></div>
+
+</section>
+<section id="bk-sv" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · SILICON VALLEY PLAN · JANUARY 2027</p>
+<h2 class="t">Three tests, one decision.</h2>
+<table class="cmp">
+<tr><th style="width:24%">Question</th><th style="width:44%">How</th><th style="width:32%">With whom</th></tr>
+<tr><td>Will Americans pay?</td><td>Waitlist page + survey of 100 people: $69 vs $89</td><td>US consumers</td></tr>
+<tr><td>Do doctors see value?</td><td>30-minute interviews</td><td>Sleep medicine at Stanford and UCSF (contacted; in-person follow-up in January)</td></tr>
+<tr><td>Who sells it with us?</td><td>Partner meetings</td><td>5 VCs · 3 medical equipment suppliers</td></tr>
+<tr class="us"><td>Decision</td><td>People pay and doctors see value → keep building</td><td>If not, we learn exactly why</td></tr>
+</table>
+<div class="pg" data-n="20"></div>
+
+</section>
+<section id="bk-proto" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · BUILD STATUS</p>
+<h2 class="t">What's built, and what's next.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">OCT 2026 · DONE</p>
+<h3 class="ct">v0.1 phone app</h3>
+<p class="cp">Detects snoring and sleeping position. Built myself.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">DONE</p>
+<h3 class="ct">Design review</h3>
+<p class="cp">A sleep researcher at KNU Hospital reviewed the design. Concept video made.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">DEC 2026 · NEXT</p>
+<h3 class="ct">Patch hardware</h3>
+<p class="cp">Off-the-shelf sensor and vibration modules first.</p>
+</div>
+<div class="card rise" style="--i:3; flex:1">
+<p class="tag">JAN 2027 · NEXT</p>
+<h3 class="ct">Silicon Valley</h3>
+<p class="cp">User, doctor and partner tests. Find a manufacturing partner.</p>
+</div>
+</div>
+<div class="pg" data-n="21"></div>
+
+</section>
+<section id="bk-advisors" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · ADVISORS</p>
+<h2 class="t">Who has reviewed the idea.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">MEDICAL</p>
+<h3 class="ct">Sleep researcher</h3>
+<p class="cp">KNU Hospital. Reviewed the device design.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">IP</p>
+<h3 class="ct">Patent attorney</h3>
+<p class="cp">Helped shape the idea and what we can protect.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">NEXT</p>
+<h3 class="ct">Sleep doctors</h3>
+<p class="cp">Stanford and UCSF, in January.</p>
+</div>
+</div>
+<div class="pg" data-n="22"></div>
+
+</section>
+<section id="bk-awards" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · TRACK RECORD</p>
+<h2 class="t">Built fast. Pitched to real people.</h2>
+<table class="cmp">
+<tr><th style="width:30%">Award</th><th style="width:42%">Project</th><th style="width:28%">Note</th></tr>
+<tr><td>MIT GSW 2026 · 2nd</td><td>NovaFlow: crowd safety; phones talk without a network</td><td>Team</td></tr>
+<tr><td>Samsung Galaxy Ideathon · 2nd</td><td>On-device blink detection against eye strain</td><td>Team of 4</td></tr>
+<tr><td>VoiceOS Hackathon, SF 2026 · 3rd</td><td>Voice-ordering AI agent (YC-backed host)</td><td>Went alone, built the team on site, gave the final pitch</td></tr>
+<tr><td>KNU Mobile App Contest · 1st</td><td>MO:DEX: Android AI hairstyling assistant</td><td>Also Best Innovation</td></tr>
+<tr><td>AI Workflow Hackathon · Grand Prize</td><td>Automated receipt checking for student council funds</td><td>Daegu · Ulsan · Gyeongbuk universities, Nov 2026</td></tr>
+</table>
+<div class="pg" data-n="23"></div>
+
+</section>
+<section id="bk-risk" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · KEY RISK</p>
+<h2 class="t">The key risk: wearing it every night.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">TEST FIRST</p>
+<h3 class="ct">One-week trial</h3>
+<p class="cp">Week 1 only measures, so people see their own data before they commit.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">STAY ASLEEP</p>
+<h3 class="ct">Softest buzz that works</h3>
+<p class="cp">Only on the back, only while snoring.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">LEARN FAST</p>
+<h3 class="ct">Nightly data</h3>
+<p class="cp">If people stop wearing it, we see it within days and fix it.</p>
+</div>
+</div>
+<div class="pg" data-n="24"></div>
+
+</section>
+<section id="competition" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">How we compare.</h2>
+<table class="cmp">
+<tr><th style="width:18%">Product</th><th style="width:34%">What it does</th><th style="width:14%">Price</th><th style="width:11%">Needs Rx</th><th style="width:12%">Tests you first</th><th style="width:11%">Knows position</th></tr>
+<tr><td>Tennis ball</td><td>A ball on your back, all night. Fewer than 1 in 10 still use it after 2.5 years</td><td>Very cheap</td><td>No</td><td>No</td><td>—</td></tr>
+<tr><td>Snore wristbands</td><td>Buzz your wrist when they hear snoring</td><td>Low-cost</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>Smart Nora</td><td>Moves your pillow when it hears snoring</td><td>$399</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>Night Shift</td><td>Buzzes whenever you’re on your back</td><td>$499</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+<tr class="us"><td>AirwayOS</td><td>7-day test, then buzzes only when you snore on your back</td><td>₩99,000 (~$69)</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+</table>
+<p class="src">Prices: Sleep Foundation (Smart Nora); 1800CPAP (Night Shift LE). Night Shift is FDA-cleared (K140190) for prescription use. Tennis ball: Bignold et al. (2009).</p>
+<div class="pg" data-n="25"></div>
+
+</section>
+<section id="qa-money" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Will people keep paying? What about refunds?</h2>
+<ul class="list">
+<li>They don’t have to: the first sale pays back acquisition (₩54,000 contribution vs. ₩25,000 target CAC).</li>
+<li>Pads are used up, so the ₩4,900 monthly plan (pads + coaching) has a real reason to stay.</li>
+<li>Refunds: 7-day test, refund minus shipping. Still profitable while refunds stay under about 30%. The free app filters who buys, and returned devices are reused.</li>
+<li>US on Amazon: $69 − 15% fee − ~$18 device − ~$6 fulfillment ≈ $35 left before ads (~51%).</li>
+<li>Market: $1.1–1.8B global, $170M US positional therapy. Goal: 10,000 users in 3 years.</li>
+</ul>
+<p class="src">Sources: Coherent MI, DelveInsight, SNS Insider (2025); Ravesloot (2017); Amazon referral fees (Beauty, Health &amp; Personal Care); Feedvisor FBA example. Device cost at ₩1,400/$. Pad cost to be confirmed.</p>
+<div class="pg" data-n="26"></div>
+
+</section>
+<section id="qa-device" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Why on the back of the shoulder?</h2>
+<ul class="list">
+<li>You only feel it when you lie on your back. On your side, it stays out of the way.</li>
+<li>One coin-sized device: motion sensor, buzz motor, Bluetooth, battery. The phone does the listening.</li>
+<li>It snaps onto a medical gel pad. Only the pad touches the skin and gets replaced.</li>
+<li>Returned devices are cleaned, tested and reused, so refunds cost less.</li>
+<li>You can put it on by yourself, and it stays put. A chest band slides around.</li>
+</ul>
+<div class="pg" data-n="27"></div>
+
+</section>
+<section id="qa-watch" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Why not just a smartwatch app?</h2>
+<ul class="list">
+<li>Your wrist doesn’t know which way your torso faces; your arm moves on its own.</li>
+<li>Clinically tested position trainers are worn on the chest or the back of the neck.</li>
+<li>Watches screen over weeks (Apple: 10 nights in a 30-day period). They don’t intervene tonight.</li>
+<li>We see watches as our funnel, not our competitor.</li>
+</ul>
+<p class="src">Sources: van Maanen et al. (2013); Apple sleep apnea notification, FDA-cleared 2024</p>
+<div class="pg" data-n="28"></div>
+
+</section>
+<section id="qa-vibration" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Won’t the vibration wake people up?</h2>
+<ul class="list">
+<li>One month of vibration position therapy: sleep efficiency did not change significantly, and daytime sleepiness dropped.</li>
+<li>Compared with the tennis-ball technique: fewer awakenings and less time awake.</li>
+<li>We buzz less often: only when you snore on your back, weakest first.</li>
+</ul>
+<p class="src">Sources: van Maanen et al., Sleep and Breathing (2013); Eijsvogel et al., J Clin Sleep Med (2015)</p>
+<div class="pg" data-n="29"></div>
+
+</section>
+<section id="qa-regulatory" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Is this a medical device?</h2>
+<ul class="list">
+<li>Phase 1: a wellness snoring aid with no medical claims, as Smart Nora is sold (“not indicated for diagnosis or treatment of sleep apnea”).</li>
+<li>The FDA’s January 2026 wellness guidance treats non-invasive sleep trackers as low-risk. We still have our claim wording reviewed.</li>
+<li>Phase 2: FDA 510(k) with Night Shift (K140190) as the comparison device. It was cleared on a 27-patient study. Then Medicare billing through DME partners.</li>
+</ul>
+<p class="src">Sources: SleepScore Labs (Smart Nora indication); FDA General Wellness guidance (Jan 2026); FDA K140190 summary; Sleep Review (CMS coverage)</p>
+<div class="pg" data-n="30"></div>
+
+</section>
+<section id="why-now" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · WHY NOW</p>
+<h2 class="t">2026 changed three things.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">EVIDENCE</p>
+<h3 class="ct">The habit lasts.</h3>
+<p class="cp">Position training kept 2 in 3 patients on their side a year after they stopped.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">RULES</p>
+<h3 class="ct">Launch as wellness.</h3>
+<p class="cp">The FDA’s January 2026 guidance treats non-invasive sleep trackers as low-risk.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">DEMAND</p>
+<h3 class="ct">Watches now warn you.</h3>
+<p class="cp">Samsung and Apple flag sleep apnea, with no next step. We are the next step.</p>
+</div>
+</div>
+<p class="src">Sources: Pavlov trial, ATS 2026 (Sleep Review); FDA General Wellness guidance, Jan 2026 (IEEE Spectrum); FDA clearances 2024 (Engadget)</p>
+<div class="pg" data-n="31"></div>
+
+</section>
+<section id="qa-moat" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Can’t someone just copy this?</h2>
+<ul class="list">
+<li>Data: every night adds posture, sound and correction data, so our personal model keeps getting better.</li>
+<li>Clinical proof: a sleep-center comparison study is a barrier late entrants have to rebuild.</li>
+<li>IP: the basic idea has prior art. After attorney review, we file on our specific control: sound + posture conditions, weakest effective nudge.</li>
+<li>Price: ₩99,000 (~$69), with free measuring first.</li>
+</ul>
+<div class="pg" data-n="32"></div>
+
+</section>
+<section id="platform" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">The patch is only the beginning.</h2>
+<div class="row" style="gap:24px">
+<div class="card hl rise" style="--i:0; flex:1"><p class="tag">NOW</p><h3 class="ct">Sleep patch</h3></div>
+<div class="card rise" style="--i:1; flex:1"><p class="tag">NEXT</p><h3 class="ct">Smartwatch</h3></div>
+<div class="card rise" style="--i:2; flex:1"><p class="tag">NEXT</p><h3 class="ct">Smart pillow</h3></div>
+<div class="card rise" style="--i:3; flex:1"><p class="tag">LATER</p><h3 class="ct">CPAP machines</h3></div>
+</div>
+<p class="body" style="margin-top:40px">Same software. Same nightly data. Any device next to your airway.</p>
+<p class="lead" style="margin-top:64px; font-weight:700; color:#F5F5F7">That’s why it’s called AirwayOS.</p>
+<div class="pg" data-n="33"></div>
+
+</section></div></div>
+<p class="lab">NEXT</p><div class="tb next" id="tbNext"><div class="stage"><section id="cover" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/13d0bb2cba8efdf26457d4ba1dcf59b4.png" alt="Concept render: the thin round white wearable in front of a tilted phone showing the AirwayOS morning report, on a dark background." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div class="rise" style="--i:1; position:absolute; left:128px; top:300px; width:980px; display:flex; align-items:center; gap:30px">
+<img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:184px; height:120px">
+<p style="margin:0; font-size:140px; font-weight:800; letter-spacing:-5px; line-height:1.0; color:#F5F5F7">AirwayOS</p>
+</div>
+<p class="rise" style="--i:2; position:absolute; left:128px; top:500px; width:980px; margin:0; font-size:64px; font-weight:700; letter-spacing:-1.5px; line-height:1.15; color:#F5F5F7">Turn over. <span style="color:#6CB4FF">Sleep easy.</span></p>
+<p style="position:absolute; left:128px; top:640px; width:900px; margin:0; font-size:30px; line-height:1.3; color:#A8A8AE">Jefferey Kim · Founder</p>
+
+</section>
+<section id="hook" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img class="" style="display:block; width:1920px; height:1080px; object-fit:cover" src="assets/bb722172c076a1e4d2cbca4b7a4666ca.jpg" alt="">
+<div style="position:absolute; right:72px; bottom:52px; width:300px; height:44px; display:flex; align-items:center; justify-content:flex-end; gap:12px; opacity:0.9"><img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:52px; height:34px"><p style="margin:0; font-size:28px; font-weight:800; letter-spacing:-0.5px; color:#F5F5F7">AirwayOS</p></div>
+
+</section>
+<section id="language" class="night foot" data-transition="fade">
+<p class="eyebrow">WHAT YOU JUST HEARD</p>
+<h2 class="t" style="margin:0px">A man who <ruby>stopped breathing<rt>숨이 멈춘</rt></ruby>.</h2>
+<p class="rec" style="position:absolute; left:128px; top:336px; width:600px"><span style="color:#FF6A55">●</span> REC · 2:47 AM</p>
+<img src="assets/127fb61fff9e0f4595bc015c03676df3.png" alt="Sound recording of a sleeper: loud snores, then about ten seconds of silence, then a sharp gasp, then quieter breathing" style="position:absolute; left:128px; top:384px; width:1664px; height:360px">
+<div class="wipe" style="position:absolute; left:120px; top:380px; width:1680px; height:368px"></div>
+<p class="rec fade" style="--d:1300ms; position:absolute; left:859px; top:512px; width:608px; text-align:center; color:#FF9A6A">10 SEC · NO BREATH</p>
+<p class="wl fade" style="--d:600ms; left:128px; top:776px; width:700px"><ruby>Snoring<rt>코골이</rt></ruby></p>
+<p class="wl hot fade" style="--d:1300ms; left:859px; top:776px; width:560px"><ruby>Silence<rt>무호흡</rt></ruby>: airway blocked</p>
+<p class="wl ok fade" style="--d:1900ms; left:1436px; top:776px; width:400px"><ruby>Gasp<rt>헉 (다시 숨)</rt></ruby>: forced to breathe</p>
+<p class="lead fade" style="--d:2300ms; position:absolute; left:128px; top:856px; width:1200px; color:#F5F5F7">Again and again, all night long.</p>
+<div class="pg" data-n="3"></div>
+
+</section>
+<section id="danger" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/c1083613bfacd1acf42deac3624a5d16.jpg" alt="Three panels: a brain scan with a marked lesion, a tired man at the wheel at night, and a crashed car at a roadside." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<p style="position:absolute; left:72px; top:56px; margin:0; font-size:88px; font-weight:900; letter-spacing:-1px; line-height:1.1; color:#F5F5F7">IT’S NOT JUST <span style="background:#E4F07A; color:#141417; padding:0px 18px">NOISE</span></p>
+<div style="position:absolute; left:56px; top:690px; width:540px">
+<p style="margin:0; font-size:24px; font-weight:700; letter-spacing:4px; color:#E4F07A">BRAIN</p>
+<p style="margin:6px 0 0 0; font-size:136px; font-weight:800; letter-spacing:-3px; line-height:1.05; color:#F5F5F7">2×</p>
+<p style="margin:10px 0 0 0; font-size:30px; line-height:1.3; color:#C7C7CC"><ruby>stroke<rt>뇌졸중</rt></ruby> risk with serious <ruby>sleep apnea<rt>수면무호흡</rt></ruby></p>
+</div>
+<div style="position:absolute; left:696px; top:690px; width:540px">
+<p style="margin:0; font-size:24px; font-weight:700; letter-spacing:4px; color:#E4F07A">BEHIND THE WHEEL</p>
+<p style="margin:6px 0 0 0; font-size:136px; font-weight:800; letter-spacing:-3px; line-height:1.05; color:#F5F5F7">2.4×</p>
+<p style="margin:10px 0 0 0; font-size:30px; line-height:1.3; color:#C7C7CC">car crash risk with sleep apnea</p>
+</div>
+<div style="position:absolute; left:1336px; top:690px; width:540px">
+<p style="margin:0; font-size:24px; font-weight:700; letter-spacing:4px; color:#E4F07A">ROAD · USA</p>
+<p style="margin:6px 0 0 0; font-size:136px; font-weight:800; letter-spacing:-3px; line-height:1.05; color:#F5F5F7">91,000</p>
+<p style="margin:10px 0 0 0; font-size:30px; line-height:1.3; color:#C7C7CC">crashes a year with a <ruby>drowsy driver<rt>졸음운전</rt></ruby>, one every 6 minutes</p>
+</div>
+
+</section>
+<section id="scale" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/78b8e167c407a43f113e4dd8a0beb356.jpg" alt="World map centered on the Americas, other continents faint. The United States is covered in 150 dots, each 200,000 people with sleep apnea. Only one dot in five is lit; the rest are dark." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div style="position:absolute; left:72px; top:700px; width:900px">
+<p style="margin:0 0 14px 0; font-size:18px; font-weight:700; letter-spacing:4px; line-height:1.3; color:#A8A8AE">1 DOT = 200,000 AMERICANS WITH <ruby>SLEEP APNEA<rt>수면무호흡</rt></ruby></p>
+<p style="margin:0; font-size:24px; line-height:1.2; color:#F5F5F7"><span style="display:inline-block; width:16px; height:16px; border-radius:50%; background:#F4F9C4; box-shadow:0 0 0 3px #141417, 0 0 0 5px #E4F07A, 0 0 16px 6px rgba(228,240,122,0.45); margin:0 16px 0 4px; vertical-align:-1px"></span>knows<span style="display:inline-block; width:16px; height:16px; border-radius:50%; background:#6B7078; box-shadow:0 0 0 3px #3E4148; margin:0 16px 0 44px; vertical-align:-1px"></span><span style="color:#A8A8AE">doesn’t know</span></p>
+</div>
+<p style="position:absolute; left:72px; top:820px; width:900px; margin:0; font-size:64px; font-weight:800; letter-spacing:-1.5px; line-height:1.08; color:#F5F5F7">30 million Americans.<br><span style="font-family:'Instrument Serif', Georgia, 'Times New Roman', serif; font-style:italic; font-weight:400; letter-spacing:0px; font-size:72px; color:#E4F07A">Far more common.</span></p>
+<div style="position:absolute; right:72px; top:812px; display:flex; gap:56px">
+<div><p style="margin:0; font-size:96px; font-weight:800; letter-spacing:-3px; line-height:1.0; color:#E4F07A">80%</p><p style="margin:14px 0 0 0; font-size:18px; font-weight:600; letter-spacing:4px; line-height:1.4; color:#C7C7CC"><ruby>NEVER DIAGNOSED<rt>진단 안 받음</rt></ruby></p></div>
+<div><p style="margin:0; font-size:96px; font-weight:800; letter-spacing:-3px; line-height:1.0; color:#E4F07A">29%</p><p style="margin:14px 0 0 0; font-size:18px; font-weight:600; letter-spacing:4px; line-height:1.4; color:#C7C7CC">SLEEP APART<br>FROM PARTNER</p></div>
+<div><p style="margin:0; font-size:96px; font-weight:800; letter-spacing:-3px; line-height:1.0; color:#E4F07A">$170M</p><p style="margin:14px 0 0 0; font-size:18px; font-weight:600; letter-spacing:4px; line-height:1.4; color:#C7C7CC">FIRST TARGET:<br>US <ruby>POSITIONAL THERAPY<rt>체위 치료</rt></ruby></p></div>
+</div>
+
+</section>
+<section id="measure" class="night" data-transition="magic" style="padding:0px; position:relative">
+<img src="assets/38b89c7cb9daad99185b8cfd2a402984.jpg" alt="A woman asleep in a sleep lab, wires taped to her face and head, a recorder on the bed beside her." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
+<div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
+<div id="fl-lead" class="fl-seg path fl-draw" style="left:0px; width:128px"></div>
+<div id="fl-g1" class="fl-node ghost" style="left:128px"></div>
+<div id="fl-g2" class="fl-node ghost" style="left:848px"></div>
+<div id="fl-g3" class="fl-node ghost" style="left:1568px"></div>
+<div id="fl-n1" class="fl-node bad fl-pop" style="left:128px; --d:700ms"><p class="fl-x">×</p></div>
+<p id="fl-l1" class="fl-lab bad" style="left:180px; width:200px">FIND OUT</p>
+<p id="fl-l2" class="fl-lab" style="left:900px; width:140px">TREAT</p>
+<p id="fl-l3" class="fl-lab" style="left:1620px; width:120px">TURN</p>
+<h2 class="t" style="position:absolute; left:128px; top:128px; width:900px; margin:0px">Barrier 1: <ruby>diagnosis<rt>진단</rt></ruby>.</h2>
+<div class="bad-rows" style="position:absolute; left:128px; top:300px">
+<div class="rise" style="--i:2"><p class="bnum">1 night</p><p class="bcap">in a sleep lab, covered in wires,<br>with a stranger watching</p></div>
+<div class="rise" style="--i:3"><p class="bnum">$3,000</p><p class="bcap">on average, without insurance</p></div>
+<div class="rise" style="--i:4"><p class="bnum">Up to half</p><p class="bcap">of patients: wrong from a single night</p></div>
+</div>
+<div style="position:absolute; left:1072px; top:852px; width:720px; box-sizing:border-box; padding:18px 22px; border-radius:14px; background:rgba(17,17,20,0.78)">
+<p style="margin:0 0 6px 0;font-weight:700;letter-spacing:4px;line-height:1.2;color:#F5F5F7;font-size:30px" data-fit="grow"><span style="color:#FF6A55">●</span>&#160;&#160;<ruby>IN-LAB SLEEP TEST<rt>수면다원검사</rt></ruby></p>
+<p style="margin:0; font-size:24px; line-height:1.3; color:#C7C7CC">polysomnography · wires on the head, face and chest</p>
+</div>
+<div class="pg" data-n="6"></div>
+
+</section>
+<section id="prevent" class="night foot" data-transition="magic">
+<div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
+<div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
+<div id="fl-lead" class="fl-seg path" style="left:0px; width:128px"></div>
+<div id="fl-s1" class="fl-seg path fl-draw" style="left:350px; width:498px; --d:200ms"></div>
+<div id="fl-g1" class="fl-node ghost" style="left:128px"></div>
+<div id="fl-g2" class="fl-node ghost" style="left:848px"></div>
+<div id="fl-g3" class="fl-node ghost" style="left:1568px"></div>
+<div id="fl-n1" class="fl-node bad" style="left:128px"><p class="fl-x">×</p></div>
+<div id="fl-n2" class="fl-node bad fl-pop" style="left:848px; --d:950ms"><p class="fl-x">×</p></div>
+<p id="fl-l1" class="fl-lab bad" style="left:180px; width:200px">FIND OUT</p>
+<p id="fl-l2" class="fl-lab bad" style="left:900px; width:140px">TREAT</p>
+<p id="fl-l3" class="fl-lab" style="left:1620px; width:120px">TURN</p>
+<h2 class="t" style="margin:0 0 48px 0">Barrier 2: <ruby>treatment<rt>치료</rt></ruby>.</h2>
+<div class="bcards">
+<div class="bcard rise" style="--i:2"><img class="bimg" src="assets/3f2abb587b76d3ebbc4d281d764a41d4.jpg" alt="A woman lies in bed at night wearing a CPAP mask over her nose and mouth."><p class="bnum2">$600+</p><p class="bcap">for a <ruby>CPAP<rt>양압기</rt></ruby> machine,<br>worn every single night</p></div>
+<div class="bcard rise" style="--i:3"><img class="bimg" src="assets/b69ae0afd919f404e3ba0f7066e6bb98.jpg" alt="A tired man in bed rubs his forehead, holding his CPAP mask away from his face."><p class="bnum2">1 in 3</p><p class="bcap">don’t use it enough</p></div>
+<div class="bcard rise" style="--i:4"><img class="bimg" src="assets/21de97e1526f8635d8a18021e0229336.jpg" alt="Medical illustration: a needle tool reaches into the soft palate at the back of the mouth."><p class="bnum2">$30,000+</p><p class="bcap">for surgery.<br>Not for everyone.</p></div>
+</div>
+<div class="pg" data-n="7"></div>
+
+</section>
+<section id="position" class="night foot" data-transition="magic">
+<div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
+<div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
+<div id="fl-lead" class="fl-seg path" style="left:0px; width:128px"></div>
+<div id="fl-s1" class="fl-seg path" style="left:350px; width:498px"></div>
+<div id="fl-s2" class="fl-seg good fl-draw" style="left:1016px; width:330px; --d:300ms"></div>
+<div id="fl-g1" class="fl-node ghost" style="left:128px"></div>
+<div id="fl-g2" class="fl-node ghost" style="left:848px"></div>
+<div id="fl-g3" class="fl-node ghost" style="left:1568px"></div>
+<div id="fl-n1" class="fl-node bad" style="left:128px"><p class="fl-x">×</p></div>
+<div id="fl-n2" class="fl-node bad" style="left:848px"><p class="fl-x">×</p></div>
+<p id="fl-l1" class="fl-lab bad" style="left:180px; width:200px">FIND OUT</p>
+<p id="fl-l2" class="fl-lab bad" style="left:900px; width:140px">TREAT</p>
+<p id="fl-l3" class="fl-lab" style="left:1620px; width:120px">TURN</p>
+<h2 class="t" style="margin:0 0 14px 0">For more than half, it’s how they sleep.</h2>
+<p style="margin:0 0 28px 0; font-size:32px; font-weight:500; line-height:1.3; color:#6CB4FF">The good news: many may not need a mask or surgery.</p>
+<div style="display:flex; gap:64px">
+<div class="rise" style="--i:2; position:relative; width:800px; height:570px; border-radius:24px; overflow:hidden">
+<img src="assets/2b9a142e3fbb93cbf6c38c3b97d96286.jpg" alt="A man sleeps on his back. Zoomed in: his tongue falls back and the airway in his throat narrows; a wavy line shows snoring." style="display:block; width:800px; height:570px; object-fit:cover">
+<p style="position:absolute; left:40px; top:28px; width:400px; margin:0; font-size:24px; font-weight:700; letter-spacing:4px; line-height:1.2; color:#E5483A">ON YOUR BACK</p>
+<p style="position:absolute; left:40px; top:272px; width:360px; margin:0; font-size:64px; font-weight:800; letter-spacing:-2px; line-height:1.0; color:#E5483A">Narrow</p>
+<p style="position:absolute; left:40px; top:352px; width:360px; margin:0; font-size:28px; line-height:1.35; color:#3A3A3C">The tongue falls back and blocks the airway.</p>
+</div>
+<div class="rise" style="--i:3; position:relative; width:800px; height:570px; border-radius:24px; overflow:hidden">
+<img src="assets/71d10cda203ca57a0b09cf071f00f4a1.jpg" alt="A man sleeps on his side. Zoomed in: the airway in his throat stays open." style="display:block; width:800px; height:570px; object-fit:cover">
+<p style="position:absolute; left:40px; top:28px; width:400px; margin:0; font-size:24px; font-weight:700; letter-spacing:4px; line-height:1.2; color:#0066CC">ON YOUR SIDE</p>
+<p style="position:absolute; left:40px; top:272px; width:360px; margin:0; font-size:64px; font-weight:800; letter-spacing:-2px; line-height:1.0; color:#0066CC">Open</p>
+<p style="position:absolute; left:40px; top:352px; width:360px; margin:0; font-size:28px; line-height:1.35; color:#3A3A3C">The airway stays open.</p>
+<p style="position:absolute; left:40px; top:440px; width:360px; margin:0; font-size:28px; font-weight:700; line-height:1.35; color:#0066CC">−54% breathing problems</p>
+</div>
+</div>
+<p style="margin:30px 0 0 0; font-size:40px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; color:#F5F5F7">The catch? You can’t control your position in your sleep.</p>
+<div class="pg" data-n="8"></div>
+
+</section>
+<section id="turn" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/9dc25377728f1ca6f276ec11cd5d4d19.png" alt="Concept render: a thin, round white wearable with a small blue light, on a clear round skin patch, lit dramatically on a dark background." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
+<div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
+<div id="fl-lead" class="fl-seg path" style="left:0px; width:128px"></div>
+<div id="fl-s1" class="fl-seg path" style="left:350px; width:498px"></div>
+<div id="fl-s2" class="fl-seg good" style="left:1016px; width:552px"></div>
+<div id="fl-g1" class="fl-node ghost" style="left:128px"></div>
+<div id="fl-g2" class="fl-node ghost" style="left:848px"></div>
+<div id="fl-g3" class="fl-node ghost" style="left:1568px"></div>
+<div id="fl-n1" class="fl-node bad" style="left:128px"><p class="fl-x">×</p></div>
+<div id="fl-n2" class="fl-node bad" style="left:848px"><p class="fl-x">×</p></div>
+<div id="fl-n3" class="fl-node good fl-pop" style="left:1568px; --d:700ms"><p class="fl-x">✓</p></div>
+<p id="fl-l1" class="fl-lab bad" style="left:180px; width:200px">FIND OUT</p>
+<p id="fl-l2" class="fl-lab bad" style="left:900px; width:140px">TREAT</p>
+<p id="fl-l3" class="fl-lab good" style="left:1620px; width:120px">TURN</p>
+<img class="rise" src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="--i:1; position:absolute; left:128px; top:186px; width:138px; height:90px">
+<p class="rise" style="--i:1; position:absolute; left:290px; top:170px; width:800px; margin:0; font-size:120px; font-weight:300; letter-spacing:-3px; line-height:1.0; color:#F5F5F7">AirwayOS</p>
+<p class="rise" style="--i:2; position:absolute; left:116px; top:290px; width:1000px; margin:0; font-size:136px; font-weight:800; font-style:italic; letter-spacing:-5px; line-height:1.05; color:#F5F5F7">Sleep Patch.</p>
+<p class="rise" style="--i:3; position:absolute; left:128px; top:452px; width:900px; margin:0; font-size:36px; font-weight:500; line-height:1.25; color:#C7C7CC">So we built this: <b style="color:#F5F5F7">a thin patch for your shoulder.</b></p>
+<div class="steps9 rise" style="--i:4; position:absolute; left:128px; top:548px; width:900px">
+<div class="st9"><p class="st9n">1</p><svg width="44" height="44" viewBox="0 0 44 44" aria-label="sound wave icon"><path d="M6 22v0M12 16v12M18 10v24M24 14v16M30 8v28M36 17v10" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="st9t">Your phone <b>listens for snoring.</b></p></div></div>
+<div class="st9"><p class="st9n">2</p><svg width="44" height="44" viewBox="0 0 44 44" aria-label="lying on the back icon"><path d="M6 26c4-7 28-7 32 0" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 30h36" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="st9t">The patch <b>senses when you’re on your back.</b></p></div></div>
+<div class="st9"><p class="st9n">3</p><svg width="44" height="44" viewBox="0 0 44 44" aria-label="vibration icon"><circle cx="22" cy="22" r="5" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14a13 13 0 0 0 0 16M32 14a13 13 0 0 1 0 16M6 9a21 21 0 0 0 0 26M38 9a21 21 0 0 1 0 26" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="st9t">Both? <b>Only then</b>, a <ruby>gentle buzz<rt>약한 진동</rt></ruby>.</p></div></div>
+<div class="st9"><p class="st9n">4</p><svg width="44" height="44" viewBox="0 0 44 44" aria-label="roll over icon"><path d="M34 16a13 13 0 1 0 2 9" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 8v8h-8" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="st9t">You <b>roll over</b> and keep sleeping.</p></div></div>
+</div>
+
+</section>
+<section id="learns" class="night foot" data-transition="fade">
+<img src="assets/6a381d5c2439d937c87b95c9b4603dc9.png" alt="" style="position:absolute; left:1100px; top:0px; width:820px; height:1080px">
+<p class="eyebrow">NEW VALUE</p>
+<h2 class="t">It learns you.</h2>
+<div class="row" style="gap:56px; align-items:center; position:relative">
+<div class="col" style="flex:1; gap:20px">
+<div class="stepc rise" style="--i:0"><p class="sn">1</p><div><p class="sk">WEEK 1</p><p class="st2">Only measures. Builds your <ruby>baseline<rt>기준치</rt></ruby>.</p></div></div>
+<div class="stepc hl rise" style="--i:1"><p class="sn">2</p><div><p class="sk">WEEK 2+</p><p class="st2">Finds the softest <ruby>buzz<rt>진동</rt></ruby> that still works.</p></div></div>
+<div class="stepc rise" style="--i:2"><p class="sn">3</p><div><p class="sk">EVERY MORNING</p><p class="st2">Shows the proof: buzzes, turns, less snoring.</p></div></div>
+<div class="strip" style="margin-top:8px"><p class="stript">Watches and apps report the problem tomorrow. Our patch acts on it tonight.</p></div>
+</div>
+<div class="col" style="gap:10px; align-items:center"><img class="rise" style="--i:3; width:311px; height:650px; object-fit:contain" src="assets/0324aff02ce23f9c597ee7ba172e995b.png" alt="App screen, morning report: a timeline of last night shows short snoring bursts while on the back, each ended by a buzz and a turn to the side; quiet score 82, 6 buzzes, turned over 5 of 6; softest buzz level 2 of 5."></div>
+</div>
+<div class="pg" data-n="10"></div>
+
+</section>
+<section id="demo" class="night foot" data-transition="fade">
+<p class="eyebrow">DEMO</p>
+<h2 class="t" style="margin:0 0 40px 0">One night, one soft buzz.</h2>
+<div class="row" style="gap:64px; align-items:flex-start">
+<img class="dm rise" style="--i:0" src="assets/eb4e95fde61d80b6d53f2339088b9a83.jpg" alt="">
+<div class="dms" style="width:480px; gap:18px; padding:0px">
+<div class="dmt-row rise" style="--i:1"><img class="dmth" src="assets/8673550debc833f525b0c69405b59547.jpg" alt="Scene: he puts the patch on the back of his shoulder"><div><p class="dmt">0:00</p><p class="dml2">Patch on</p></div></div>
+<div class="dmt-row rise" style="--i:2"><img class="dmth hot" src="assets/b9c651517ce973c57bbcc7d8ecf80312.jpg" alt="Scene: he snores on his back while his partner covers her ear"><div><p class="dmt">0:01</p><p class="dml2 hot">On his back. Snoring.</p></div></div>
+<div class="dmt-row rise" style="--i:3"><img class="dmth ok" src="assets/45e27f32224626c1178a37a67b591bb9.jpg" alt="Scene: a soft blue glow under his shoulder as the patch buzzes"><div><p class="dmt">0:04</p><p class="dml2 ok">Gentle buzz</p></div></div>
+<div class="dmt-row rise" style="--i:4"><img class="dmth ok" src="assets/395ee482bbdd96dd3e5a17b109dc704a.jpg" alt="Scene: he rolls onto his side, still asleep"><div><p class="dmt">0:05</p><p class="dml2 ok">Rolls over</p></div></div>
+<div class="dmt-row rise" style="--i:5"><img class="dmth" src="assets/68fd1e06dc16d3e95cdb2157174dcb26.jpg" alt="Scene: both asleep, his partner relaxed"><div><p class="dmt">0:10</p><p class="dml2">Snoring stops. Still asleep.</p></div></div>
+</div>
+</div>
+<div class="pg" data-n="11"></div>
+
+</section>
+<section id="compete" class="night foot" data-transition="fade">
+<p class="eyebrow">COMPETITIVE ADVANTAGE</p>
+<h2 class="t" style="margin:0 0 40px 0">Easy and effective, every night.</h2>
+<div class="qd">
+<div class="qz fade" style="--d:900ms"></div>
+<div class="qx"></div>
+<div class="qy"></div>
+<p class="qax" style="left:20px;top:10px;width:560px;text-align:right;transform:translate(-608px, -10px)">↑&nbsp;<br>WORKS<br>(REAL-LIFE<br>EFFECT)</p>
+<p class="qax" style="left:1060px;top:536px;width:480px;text-align:right;transform:translate(20px, 64px)">EASY TO USE EVERY NIGHT →</p>
+<p class="qax go fade" style="--d:900ms; left:1240px; top:16px; width:300px; text-align:right">OUR TARGET</p>
+<p class="qdot" style="--d:150ms; left:125px; top:190px"><ruby>Surgery<rt>수술</rt></ruby></p>
+<p class="qdot" style="--d:250ms; left:245px; top:262px"><ruby>CPAP mask<rt>양압기</rt></ruby></p>
+<p class="qdot" style="--d:350ms; left:470px; top:150px"><ruby>Dental device<rt>구강 장치</rt></ruby></p>
+<p class="qdot" style="--d:450ms; left:735px; top:95px"><ruby>Prescription trainers<rt>처방 자세교정기</rt></ruby></p>
+<p class="qdot" style="--d:550ms; left:990px; top:345px">Smart pillows</p>
+<p class="qdot" style="--d:650ms; left:1320px; top:470px">Apps &amp; watches</p>
+<p class="qdot" style="--d:750ms; left:190px; top:500px">Live with it</p>
+<div class="qus" style="left:1290px; top:150px"><img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:62px; height:40px"><p class="qust">AirwayOS</p></div>
+</div>
+<div class="pg" data-n="12"></div>
+
+</section>
+<section id="model" class="night foot" data-transition="fade">
+<p class="eyebrow">BUSINESS MODEL</p>
+<h2 class="t" style="margin:0 0 40px 0">Our business model is straightforward.</h2>
+<div class="bm">
+<div class="bmt hl rise" style="--i:1; width:900px">
+<img class="bmi" src="assets/0fd5cebf9d3d6cab7a17c37f1cf98726.png" alt="Concept render: the round patch device with two spare pads">
+<p class="bmk">① THE KIT</p>
+<p class="bmh">₩99,000 <span class="bmu">~$69</span></p>
+<p class="bmc">with a one-week trial</p>
+</div>
+<p class="bma">→</p>
+<div class="bmt rise" style="--i:2; width:716px">
+<img class="bmi" src="assets/ccc90ad29fcb6c90293ca691762c6ebf.png" alt="Concept render: a fan of refill pads">
+<p class="bmk">② THEN</p>
+<p class="bmh">₩4,900<span class="bmu"> / month</span></p>
+<p class="bmc">for replacement pads</p>
+</div>
+</div>
+<p class="uek" style="margin-top:44px">③ WITH A 55% <ruby>GROSS MARGIN<rt>매출총이익</rt></ruby> · PER KIT</p>
+<div class="ueb">
+<div class="ues dev" style="width:421px; --d:500ms"><p class="uel">DEVICE</p><p class="uev">₩25,000</p></div>
+<div class="ues ops" style="width:336px; --d:800ms"><p class="uel">FEES &amp; SHIPPING</p><p class="uev">₩20,000</p></div>
+<div class="ues con" style="width:907px; --d:1100ms"><p class="uel">GROSS MARGIN · 55%</p><p class="uev">₩54,000</p></div>
+</div>
+<div class="cac rise" style="--i:14">
+<div class="cacb"><p class="cact"><ruby>CUSTOMER COST<rt>고객 획득 비용</rt></ruby> ≤ ₩25,000</p></div>
+<p class="cacr">✓ The very first sale pays it back</p>
+</div>
+<div class="pg" data-n="13"></div>
+
+</section>
+<section id="team" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/52fb4ccf1f563e7bfe0ec479efceac2a.jpg" alt="Jefferey Kim pitching on stage at MIT Global Startup Workshop 2026." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<p style="position:absolute;left:128px;top:100px;width:600px;margin:0;font-weight:700;letter-spacing:4px;color:#E4F07A;font-size:30px">WHY ME</p>
+<p class="rise" style="--i:1; position:absolute; left:128px; top:140px; width:820px; margin:0; font-size:60px; font-weight:800; letter-spacing:-1.5px; line-height:1.1; color:#F5F5F7">I live with this problem.<br>I build products people use.</p>
+<p style="position:absolute; left:128px; top:292px; width:700px; margin:0; font-size:28px; line-height:1.3; color:#C7C7CC">Jefferey Kim · Mobile Engineering, KNU</p>
+<p class="rise" style="--i:2; position:absolute; left:128px; top:346px; width:820px; margin:0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:2px; line-height:1.2; color:#E4F07A">⚙&#160;&#160;BUILT PROTOTYPE v0.1 MYSELF · OCT 2026</p>
+<div class="rise" style="--i:2; position:absolute; left:128px; top:430px; width:640px">
+<p style="margin:0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:3px; line-height:1.2; color:#E4F07A">↗&#160;&#160;PITCHED AND WON AT</p>
+<div style="display:flex; gap:36px; align-items:center; margin-top:18px">
+<img src="assets/9555d60319b232aa9dafc891c6e997be.png" alt="MIT" style="width:75px; height:46px">
+<img src="assets/4173dab122177bd8229b2b453dae65f6.png" alt="Samsung Galaxy" style="width:106px; height:46px">
+<img src="assets/0c1eb823348bc1be3b5f927eecb851b1.png" alt="UC Berkeley" style="width:149px; height:46px">
+<img src="assets/41471f2a6409f170d746118ccca67db5.png" alt="VoiceOS" style="width:163px; height:34px">
+</div>
+<div style="margin-top:44px"><p style="margin:0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:3px; line-height:1.2; color:#E4F07A">◎&#160;&#160;DESIGN REVIEWED BY</p></div>
+<p style="margin:12px 0 0 0; font-size:36px; font-weight:800; line-height:1.2; color:#F5F5F7">Sleep researcher · KNU Hospital</p>
+</div>
+<div class="rise" style="--i:3; position:absolute; left:128px; top:822px; width:1664px; display:grid; grid-template-columns:repeat(6, 1fr); column-gap:16px">
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">MIT GSW</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">2ND · 2026</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">GALAXY<br>IDEATHON</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">2ND · SAMSUNG</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">VOICEOS<br>HACKATHON</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">3RD · SF 2026</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">MO:DEX<br>APP CONTEST</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">1ST · KNU</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="trophy icon"><path d="M12 6h16v8a8 8 0 0 1-16 0zM12 9H6v2a6 6 0 0 0 6 6M28 9h6v2a6 6 0 0 1-6 6M20 22v6M14 34h12M16 28h8v6h-8z" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">AI WORKFLOW<br>HACKATHON</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">GRAND PRIZE</p></div>
+<div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="graduation cap icon"><path d="M3 15 20 8l17 7-17 7zM10 18v8c3 3 17 3 20 0v-8M35 16v9" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">UC BERKELEY</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">SUMMER 2026</p></div>
+</div>
+
+</section>
+<section id="sv" class="night foot" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/69895ad92e928ca3d58c5f10ebeb0bbc.jpg" alt="Dotted map of the San Francisco Bay Area, with San Francisco and Stanford lit in blue." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<p class="eyebrow" style="position:absolute; left:128px; top:128px; width:900px; margin:0">IN SILICON VALLEY · JANUARY 2027</p>
+<h2 class="t" style="position:absolute; left:128px; top:176px; width:900px; margin:0">Not a trip. A test.</h2>
+<p class="rise" style="--i:0; position:absolute; left:128px; top:278px; width:780px; margin:0; font-size:28px; line-height:1.3; color:#A8A8AE"><b style="color:#F5F5F7">In Silicon Valley, I’ll <ruby>validate<rt>검증</rt></ruby> three things.</b></p>
+<div class="col" style="position:absolute; left:128px; top:370px; width:820px; gap:32px">
+<div class="svr rise" style="--i:1"><p class="svn">01</p><div><p class="svh">Will Americans pay? $69 or $89?</p><p class="svc">Waitlist page + survey of 100 people</p></div></div>
+<div class="svr rise" style="--i:2"><p class="svn">02</p><div><p class="svh">How do sleep doctors see it?</p><p class="svc">Already reached out to Stanford and UCSF</p></div></div>
+<div class="svr rise" style="--i:3"><p class="svn">03</p><div><p class="svh">Which partners can help us sell?</p><p class="svc">5 VCs · 3 medical equipment suppliers</p></div></div>
+</div>
+<div class="pin" style="left:1259px; top:360px; --d:700ms"></div>
+<p class="pinl rise" style="--i:7; left:1040px; top:300px; width:186px; text-align:right">UCSF <span>02</span></p>
+<div class="pin" style="left:1498px; top:711px; --d:900ms"></div>
+<p class="pinl rise" style="--i:8; left:1540px; top:700px; width:236px">STANFORD <span>02</span></p>
+<p class="pinl rise" style="--i:6; left:1484px; top:150px; width:300px; color:#8E8E93; font-weight:400">SAN FRANCISCO BAY</p>
+<div class="rd-track" style="left:140px; width:1640px"></div>
+<div class="rd-seg" style="left:140px; width:540px; --d:1100ms"></div>
+<div class="rd-node on" style="left:128px"></div>
+<div class="rd-node" style="left:668px"></div>
+<div class="rd-node" style="left:1208px"></div>
+<div class="rd-node" style="left:1748px"></div>
+<p class="rdl on" style="left:128px; width:460px">NOW · VALIDATE IN KOREA</p>
+<p class="rdl" style="left:668px; width:460px">2027 · US WELLNESS LAUNCH</p>
+<p class="rdl" style="left:1208px; width:300px">FDA 510(k)</p>
+<p class="rdl" style="left:1492px; width:280px; text-align:right">MEDICARE</p>
+<div class="pg" data-n="15"></div>
+
+</section>
+<section id="close" class="night" data-transition="fade" style="padding:0px; position:relative">
+<img src="assets/db1482350e6b812cde4dcf14d8e4c796.jpg" alt="Illustration: a person sleeps peacefully on their side under a starry night sky, a small patch on their upper back." style="display:block; width:1920px; height:1080px; object-fit:cover">
+<div class="rise" style="--i:0; position:absolute; left:128px; top:236px; width:600px; display:flex; align-items:center; gap:16px">
+<img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:86px; height:56px">
+<p style="margin:0; font-size:44px; font-weight:800; letter-spacing:-1px; line-height:1.0; color:#F5F5F7">AirwayOS</p>
+</div>
+<p class="rise" style="--i:1; position:absolute; left:128px; top:330px; width:900px; margin:0; font-size:120px; font-weight:800; letter-spacing:-4px; line-height:1.02; color:#F5F5F7">Turn over.<br><span style="color:#6CB4FF">Sleep easy.</span></p>
+<p class="rise" style="--i:2; position:absolute; left:128px; top:620px; width:760px; margin:0; font-size:34px; line-height:1.35; color:#D0D2E0">No one should have to choose between sleeping well and sleeping together.</p>
+
+</section>
+<section id="bk-customer" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · FIRST CUSTOMER &amp; MARKET</p>
+<h2 class="t">First customer: back-sleeping snorers in the US.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">WHO</p>
+<h3 class="ct">Snores mostly on the back</h3>
+<p class="cp">Often the partner is the one who pushes them to act.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">WHERE THEY ARE</p>
+<h3 class="ct">Not ready for a lab or CPAP</h3>
+<p class="cp">They want something easy that works tonight.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">FIRST MARKET</p>
+<h3 class="ct">$170M</h3>
+<p class="cp">US positional therapy. 30M Americans have sleep apnea; 80% are undiagnosed.</p>
+</div>
+</div>
+<p class="src">Market: Coherent MI, DelveInsight, SNS Insider (2025). Prevalence and undiagnosed share as on slide 5.</p>
+<div class="pg" data-n="17"></div>
+
+</section>
+<section id="bk-price" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · PRICING</p>
+<h2 class="t">$69: low enough to try without a doctor.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">PRESCRIPTION DEVICE</p>
+<h3 class="ct">$499</h3>
+<p class="cp">Night Shift. Needs a prescription, and you only find out if it suits you after you buy.</p>
+</div>
+<div class="card hl rise" style="--i:1; flex:1">
+<p class="tag">AIRWAYOS KIT</p>
+<h3 class="ct">$69 · ₩99,000</h3>
+<p class="cp">No prescription. One-week trial. 55% gross margin.</p>
+</div>
+<div class="card rise" style="--i:2; flex:1">
+<p class="tag">NEXT TEST</p>
+<h3 class="ct">$69 vs $89</h3>
+<p class="cp">Waitlist page and a survey of 100 people in Silicon Valley.</p>
+</div>
+</div>
+<p class="src">Night Shift price: 1800CPAP (Night Shift LE). Margin: slide 13.</p>
+<div class="pg" data-n="18"></div>
+
+</section>
+<section id="bk-us" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · WHY THE US FIRST</p>
+<h2 class="t">Bigger need in the US. Korea is the test bed.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card hl rise" style="--i:0; flex:1.3">
+<p class="tag">US · THE NEED</p>
+<h3 class="ct">30M with sleep apnea</h3>
+<p class="cp">80% undiagnosed. A sleep test costs about $3,000 without insurance.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">KOREA · NOW</p>
+<h3 class="ct">Build and validate</h3>
+<p class="cp">Prototype and first user tests here, at KNU.</p>
+</div>
+<div class="card rise" style="--i:2; flex:1">
+<p class="tag">ROADMAP</p>
+<h3 class="ct">2027 US online launch</h3>
+<p class="cp">Then FDA 510(k), then Medicare.</p>
+</div>
+</div>
+<p class="src">Sources as on slides 5 and 6.</p>
+<div class="pg" data-n="19"></div>
+
+</section>
+<section id="bk-sv" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · SILICON VALLEY PLAN · JANUARY 2027</p>
+<h2 class="t">Three tests, one decision.</h2>
+<table class="cmp">
+<tr><th style="width:24%">Question</th><th style="width:44%">How</th><th style="width:32%">With whom</th></tr>
+<tr><td>Will Americans pay?</td><td>Waitlist page + survey of 100 people: $69 vs $89</td><td>US consumers</td></tr>
+<tr><td>Do doctors see value?</td><td>30-minute interviews</td><td>Sleep medicine at Stanford and UCSF (contacted; in-person follow-up in January)</td></tr>
+<tr><td>Who sells it with us?</td><td>Partner meetings</td><td>5 VCs · 3 medical equipment suppliers</td></tr>
+<tr class="us"><td>Decision</td><td>People pay and doctors see value → keep building</td><td>If not, we learn exactly why</td></tr>
+</table>
+<div class="pg" data-n="20"></div>
+
+</section>
+<section id="bk-proto" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · BUILD STATUS</p>
+<h2 class="t">What's built, and what's next.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">OCT 2026 · DONE</p>
+<h3 class="ct">v0.1 phone app</h3>
+<p class="cp">Detects snoring and sleeping position. Built myself.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">DONE</p>
+<h3 class="ct">Design review</h3>
+<p class="cp">A sleep researcher at KNU Hospital reviewed the design. Concept video made.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">DEC 2026 · NEXT</p>
+<h3 class="ct">Patch hardware</h3>
+<p class="cp">Off-the-shelf sensor and vibration modules first.</p>
+</div>
+<div class="card rise" style="--i:3; flex:1">
+<p class="tag">JAN 2027 · NEXT</p>
+<h3 class="ct">Silicon Valley</h3>
+<p class="cp">User, doctor and partner tests. Find a manufacturing partner.</p>
+</div>
+</div>
+<div class="pg" data-n="21"></div>
+
+</section>
+<section id="bk-advisors" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · ADVISORS</p>
+<h2 class="t">Who has reviewed the idea.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">MEDICAL</p>
+<h3 class="ct">Sleep researcher</h3>
+<p class="cp">KNU Hospital. Reviewed the device design.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">IP</p>
+<h3 class="ct">Patent attorney</h3>
+<p class="cp">Helped shape the idea and what we can protect.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">NEXT</p>
+<h3 class="ct">Sleep doctors</h3>
+<p class="cp">Stanford and UCSF, in January.</p>
+</div>
+</div>
+<div class="pg" data-n="22"></div>
+
+</section>
+<section id="bk-awards" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · TRACK RECORD</p>
+<h2 class="t">Built fast. Pitched to real people.</h2>
+<table class="cmp">
+<tr><th style="width:30%">Award</th><th style="width:42%">Project</th><th style="width:28%">Note</th></tr>
+<tr><td>MIT GSW 2026 · 2nd</td><td>NovaFlow: crowd safety; phones talk without a network</td><td>Team</td></tr>
+<tr><td>Samsung Galaxy Ideathon · 2nd</td><td>On-device blink detection against eye strain</td><td>Team of 4</td></tr>
+<tr><td>VoiceOS Hackathon, SF 2026 · 3rd</td><td>Voice-ordering AI agent (YC-backed host)</td><td>Went alone, built the team on site, gave the final pitch</td></tr>
+<tr><td>KNU Mobile App Contest · 1st</td><td>MO:DEX: Android AI hairstyling assistant</td><td>Also Best Innovation</td></tr>
+<tr><td>AI Workflow Hackathon · Grand Prize</td><td>Automated receipt checking for student council funds</td><td>Daegu · Ulsan · Gyeongbuk universities, Nov 2026</td></tr>
+</table>
+<div class="pg" data-n="23"></div>
+
+</section>
+<section id="bk-risk" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · KEY RISK</p>
+<h2 class="t">The key risk: wearing it every night.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">TEST FIRST</p>
+<h3 class="ct">One-week trial</h3>
+<p class="cp">Week 1 only measures, so people see their own data before they commit.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">STAY ASLEEP</p>
+<h3 class="ct">Softest buzz that works</h3>
+<p class="cp">Only on the back, only while snoring.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">LEARN FAST</p>
+<h3 class="ct">Nightly data</h3>
+<p class="cp">If people stop wearing it, we see it within days and fix it.</p>
+</div>
+</div>
+<div class="pg" data-n="24"></div>
+
+</section>
+<section id="competition" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">How we compare.</h2>
+<table class="cmp">
+<tr><th style="width:18%">Product</th><th style="width:34%">What it does</th><th style="width:14%">Price</th><th style="width:11%">Needs Rx</th><th style="width:12%">Tests you first</th><th style="width:11%">Knows position</th></tr>
+<tr><td>Tennis ball</td><td>A ball on your back, all night. Fewer than 1 in 10 still use it after 2.5 years</td><td>Very cheap</td><td>No</td><td>No</td><td>—</td></tr>
+<tr><td>Snore wristbands</td><td>Buzz your wrist when they hear snoring</td><td>Low-cost</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>Smart Nora</td><td>Moves your pillow when it hears snoring</td><td>$399</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>Night Shift</td><td>Buzzes whenever you’re on your back</td><td>$499</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+<tr class="us"><td>AirwayOS</td><td>7-day test, then buzzes only when you snore on your back</td><td>₩99,000 (~$69)</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+</table>
+<p class="src">Prices: Sleep Foundation (Smart Nora); 1800CPAP (Night Shift LE). Night Shift is FDA-cleared (K140190) for prescription use. Tennis ball: Bignold et al. (2009).</p>
+<div class="pg" data-n="25"></div>
+
+</section>
+<section id="qa-money" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Will people keep paying? What about refunds?</h2>
+<ul class="list">
+<li>They don’t have to: the first sale pays back acquisition (₩54,000 contribution vs. ₩25,000 target CAC).</li>
+<li>Pads are used up, so the ₩4,900 monthly plan (pads + coaching) has a real reason to stay.</li>
+<li>Refunds: 7-day test, refund minus shipping. Still profitable while refunds stay under about 30%. The free app filters who buys, and returned devices are reused.</li>
+<li>US on Amazon: $69 − 15% fee − ~$18 device − ~$6 fulfillment ≈ $35 left before ads (~51%).</li>
+<li>Market: $1.1–1.8B global, $170M US positional therapy. Goal: 10,000 users in 3 years.</li>
+</ul>
+<p class="src">Sources: Coherent MI, DelveInsight, SNS Insider (2025); Ravesloot (2017); Amazon referral fees (Beauty, Health &amp; Personal Care); Feedvisor FBA example. Device cost at ₩1,400/$. Pad cost to be confirmed.</p>
+<div class="pg" data-n="26"></div>
+
+</section>
+<section id="qa-device" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Why on the back of the shoulder?</h2>
+<ul class="list">
+<li>You only feel it when you lie on your back. On your side, it stays out of the way.</li>
+<li>One coin-sized device: motion sensor, buzz motor, Bluetooth, battery. The phone does the listening.</li>
+<li>It snaps onto a medical gel pad. Only the pad touches the skin and gets replaced.</li>
+<li>Returned devices are cleaned, tested and reused, so refunds cost less.</li>
+<li>You can put it on by yourself, and it stays put. A chest band slides around.</li>
+</ul>
+<div class="pg" data-n="27"></div>
+
+</section>
+<section id="qa-watch" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Why not just a smartwatch app?</h2>
+<ul class="list">
+<li>Your wrist doesn’t know which way your torso faces; your arm moves on its own.</li>
+<li>Clinically tested position trainers are worn on the chest or the back of the neck.</li>
+<li>Watches screen over weeks (Apple: 10 nights in a 30-day period). They don’t intervene tonight.</li>
+<li>We see watches as our funnel, not our competitor.</li>
+</ul>
+<p class="src">Sources: van Maanen et al. (2013); Apple sleep apnea notification, FDA-cleared 2024</p>
+<div class="pg" data-n="28"></div>
+
+</section>
+<section id="qa-vibration" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Won’t the vibration wake people up?</h2>
+<ul class="list">
+<li>One month of vibration position therapy: sleep efficiency did not change significantly, and daytime sleepiness dropped.</li>
+<li>Compared with the tennis-ball technique: fewer awakenings and less time awake.</li>
+<li>We buzz less often: only when you snore on your back, weakest first.</li>
+</ul>
+<p class="src">Sources: van Maanen et al., Sleep and Breathing (2013); Eijsvogel et al., J Clin Sleep Med (2015)</p>
+<div class="pg" data-n="29"></div>
+
+</section>
+<section id="qa-regulatory" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Is this a medical device?</h2>
+<ul class="list">
+<li>Phase 1: a wellness snoring aid with no medical claims, as Smart Nora is sold (“not indicated for diagnosis or treatment of sleep apnea”).</li>
+<li>The FDA’s January 2026 wellness guidance treats non-invasive sleep trackers as low-risk. We still have our claim wording reviewed.</li>
+<li>Phase 2: FDA 510(k) with Night Shift (K140190) as the comparison device. It was cleared on a 27-patient study. Then Medicare billing through DME partners.</li>
+</ul>
+<p class="src">Sources: SleepScore Labs (Smart Nora indication); FDA General Wellness guidance (Jan 2026); FDA K140190 summary; Sleep Review (CMS coverage)</p>
+<div class="pg" data-n="30"></div>
+
+</section>
+<section id="why-now" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX · WHY NOW</p>
+<h2 class="t">2026 changed three things.</h2>
+<div class="row" style="align-items:stretch">
+<div class="card rise" style="--i:0; flex:1">
+<p class="tag">EVIDENCE</p>
+<h3 class="ct">The habit lasts.</h3>
+<p class="cp">Position training kept 2 in 3 patients on their side a year after they stopped.</p>
+</div>
+<div class="card rise" style="--i:1; flex:1">
+<p class="tag">RULES</p>
+<h3 class="ct">Launch as wellness.</h3>
+<p class="cp">The FDA’s January 2026 guidance treats non-invasive sleep trackers as low-risk.</p>
+</div>
+<div class="card hl rise" style="--i:2; flex:1">
+<p class="tag">DEMAND</p>
+<h3 class="ct">Watches now warn you.</h3>
+<p class="cp">Samsung and Apple flag sleep apnea, with no next step. We are the next step.</p>
+</div>
+</div>
+<p class="src">Sources: Pavlov trial, ATS 2026 (Sleep Review); FDA General Wellness guidance, Jan 2026 (IEEE Spectrum); FDA clearances 2024 (Engadget)</p>
+<div class="pg" data-n="31"></div>
+
+</section>
+<section id="qa-moat" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">Can’t someone just copy this?</h2>
+<ul class="list">
+<li>Data: every night adds posture, sound and correction data, so our personal model keeps getting better.</li>
+<li>Clinical proof: a sleep-center comparison study is a barrier late entrants have to rebuild.</li>
+<li>IP: the basic idea has prior art. After attorney review, we file on our specific control: sound + posture conditions, weakest effective nudge.</li>
+<li>Price: ₩99,000 (~$69), with free measuring first.</li>
+</ul>
+<div class="pg" data-n="32"></div>
+
+</section>
+<section id="platform" class="night foot" data-transition="fade">
+<p class="eyebrow">APPENDIX</p>
+<h2 class="t">The patch is only the beginning.</h2>
+<div class="row" style="gap:24px">
+<div class="card hl rise" style="--i:0; flex:1"><p class="tag">NOW</p><h3 class="ct">Sleep patch</h3></div>
+<div class="card rise" style="--i:1; flex:1"><p class="tag">NEXT</p><h3 class="ct">Smartwatch</h3></div>
+<div class="card rise" style="--i:2; flex:1"><p class="tag">NEXT</p><h3 class="ct">Smart pillow</h3></div>
+<div class="card rise" style="--i:3; flex:1"><p class="tag">LATER</p><h3 class="ct">CPAP machines</h3></div>
+</div>
+<p class="body" style="margin-top:40px">Same software. Same nightly data. Any device next to your airway.</p>
+<p class="lead" style="margin-top:64px; font-weight:700; color:#F5F5F7">That’s why it’s called AirwayOS.</p>
+<div class="pg" data-n="33"></div>
+
+</section></div></div></div></div>
+<div id="hint"><span><b>← →</b> 이동</span><span><b>숫자+Enter</b> 슬라이드로</span><span><b>T</b> 타이머 리셋</span><span><b>+ −</b> 글자 크기</span><span><b>K</b> 한국어 뜻</span><span>발표 화면(index.html)을 같은 브라우저에 열어두면 같이 넘어가</span></div>
+<div id="goto"></div>
+<script type="application/json" id="pdata">[{"title": "AirwayOS", "time": "0:00–0:25", "lines": ["Good afternoon, everyone.", "I’m <b>Jefferey Kim<\/b>, founder of <b>AirwayOS<\/b>.", "<i>(초콜릿을 한 명씩 건네며, 웃으면서)<\/i> <b>Sweet dreams.<\/b>", "<i>(앞으로 돌아와서)<\/i> <b>Everyone wants sweet dreams.<\/b>", "But for millions of people,", "<b>the night sounds like this.<\/b> <i>(클릭 → 소리)<\/i>"], "ko": "안녕하세요, 여러분. AirwayOS 창업자 김민재입니다. (초콜릿을 건네며) 달콤한 꿈 꾸세요. (돌아와서) 누구나 달콤한 꿈을 원하죠. 하지만 수많은 사람들에게, 밤은 이런 소리예요."}, {"title": "(Sound)", "time": "0:25–0:37", "lines": ["<i>(소리가 끝날 때까지 아무 말도 하지 않기)<\/i>"], "ko": ""}, {"title": "A man who stopped breathing.", "time": "0:37–1:02", "lines": ["What you just heard", "was a man <b>who stopped breathing.<\/b>", "<i>(화면 왼쪽)<\/i> First, the <b>snoring.<\/b>", "<i>(가운데)<\/i> Then <b>silence<\/b>: his airway is <b>blocked.<\/b>", "<i>(오른쪽, 숨을 “헉” 들이쉬며)<\/i> Then a <b>gasp<\/b>,", "as his body <b>forces him to breathe again.<\/b>", "Again and again, <b>all night long.<\/b>", "<i>(한 박자)<\/i> <b>I snore, too.<\/b>", "And today, <b>a phone can recognize this pattern.<\/b>"], "ko": "방금 들으신 건 숨이 멈춘 사람의 소리예요. 먼저 코골이, 그다음 정적. 숨길이 막힌 거예요. 그리고 몸이 억지로 다시 숨을 쉬게 하면서 ‘헉’ 하고 들이쉬죠. 이게 밤새 계속 반복돼요. … 저도 코를 골아요. 그리고 이제 휴대폰이 이 패턴을 알아볼 수 있어요."}, {"title": "danger", "time": "1:02–1:22", "lines": ["This is not just noise.", "It’s a <b>health risk.<\/b>", "<b>Serious<\/b> sleep apnea <b>doubles<\/b> the risk of stroke,", "and <b>more than doubles<\/b> the risk of a car crash.", "And in the US,", "a drowsy driver crashes", "<b>every six minutes.<\/b>"], "ko": "이건 그냥 소음이 아니에요. 건강 위험이에요. 중증 수면무호흡은 뇌졸중 위험을 2배로, 교통사고 위험은 2배 넘게 높여요. 그리고 미국에서는 6분마다 졸음운전 사고가 한 건씩 나요."}, {"title": "scale", "time": "1:22–1:44", "lines": ["And it’s <b>far more common<\/b> than you think.", "<i>(지도를 가리키며)<\/i> <b>Thirty million<\/b> Americans have sleep apnea,", "and <b>eighty percent<\/b> have <b>never been diagnosed.<\/b>", "<b>Twenty-nine percent<\/b> sleep apart from their partner.", "Our first target, <b>positional therapy in the US<\/b>,", "is a <b>170-million-dollar<\/b> market."], "ko": "그리고 생각보다 훨씬 흔해요. 미국인 3천만 명이 수면무호흡을 앓고 있고, 80%는 진단을 받은 적이 없어요. 29%는 파트너와 따로 자요. 저희의 첫 목표 시장인 미국 체위 치료 시장은 1억 7천만 달러 규모예요."}, {"title": "Barrier 1: diagnosis.", "time": "1:44–2:06", "lines": ["So why don’t people get help?", "The <b>first barrier is diagnosis<\/b>:", "<b>a night in a sleep lab<\/b>,", "<i>(사진을 가리키며)<\/i> <b>covered in wires.<\/b>", "It costs about <b>three thousand dollars<\/b> without insurance.", "And a single night", "can be <b>wrong for up to half<\/b> of patients."], "ko": "그럼 사람들은 왜 치료를 안 받을까요? 첫 번째 장벽은 진단이에요. 수면 검사실에서 온몸에 전선을 붙이고 하룻밤을 자야 해요. 보험 없이 약 3천 달러가 들어요. 그리고 하룻밤 검사로는 환자의 최대 절반까지 결과가 틀릴 수 있어요."}, {"title": "Barrier 2: treatment.", "time": "2:06–2:26", "lines": ["The <b>second barrier is treatment.<\/b>", "The standard is a <b>CPAP mask<\/b>,", "worn <b>every single night.<\/b>", "The machine costs <b>six hundred dollars or more<\/b>,", "and <b>one in three<\/b> patients don’t use it enough.", "Surgery? <b>Over thirty thousand dollars.<\/b>"], "ko": "두 번째 장벽은 치료예요. 표준 치료는 양압기 마스크인데, 매일 밤 빠짐없이 써야 해요. 기계만 600달러 이상이고, 환자 3명 중 1명은 충분히 쓰지 않아요. 수술은요? 3만 달러가 넘어요."}, {"title": "For more than half, it’s how they sleep.", "time": "2:26–2:51", "lines": ["<i>(톤을 올려서)<\/i> But here’s the <b>good news.<\/b>", "For <b>more than half<\/b> of patients,", "it depends on <b>how they sleep.<\/b>", "<i>(왼쪽 카드)<\/i> On your back, the tongue falls back", "and <b>blocks the airway.<\/b>", "<i>(오른쪽 카드)<\/i> On your side, the airway <b>stays open.<\/b>", "<i>(한 박자)<\/i> The catch?", "You <b>can’t control your position<\/b> in your sleep."], "ko": "그런데 좋은 소식이 있어요. 환자의 절반 이상은 ‘어떻게 누워 자느냐’에 달려 있어요. 똑바로 누우면 혀가 뒤로 넘어가 숨길을 막아요. 옆으로 누우면 숨길이 열려 있어요. 문제는, 잠든 동안에는 자세를 조절할 수 없다는 거죠."}, {"title": "Sleep Patch", "time": "2:51–3:13", "lines": ["So we built this:", "<b>a thin patch<\/b> for your shoulder.", "Your phone <b>listens for snoring<\/b>,", "and the patch <b>senses when you’re on your back.<\/b>", "When both happen, and <b>only then<\/b>,", "it gives a <b>gentle buzz.<\/b>", "You roll over", "and <b>keep sleeping.<\/b>"], "ko": "그래서 이걸 만들었어요. 어깨에 붙이는 얇은 패치예요. 휴대폰은 코골이를 듣고, 패치는 똑바로 누웠는지 감지해요. 둘 다일 때, 그때만 살짝 진동해요. 돌아눕고, 계속 자면 돼요."}, {"title": "It learns you.", "time": "3:13–3:33", "lines": ["And it <b>learns you.<\/b>", "Week one, it <b>only measures<\/b>,", "to build <b>your baseline.<\/b>", "From week two, it finds", "<b>the softest buzz that still works.<\/b>", "<i>(천천히)<\/i> Watches and apps <b>report the problem tomorrow.<\/b>", "Our patch <b>acts on it tonight.<\/b>"], "ko": "그리고 사용자를 학습해요. 첫 주에는 측정만 하면서 나만의 기준치를 만들어요. 둘째 주부터는 여전히 효과가 있는 가장 약한 진동을 찾아요. 워치와 앱은 문제를 내일 알려주지만, 저희 패치는 오늘 밤 바로 대응해요."}, {"title": "One night, one soft buzz.", "time": "3:33–3:51", "lines": ["Let me <b>show you how it works.<\/b> <i>(영상 재생, 약 11초)<\/i>", "He’s on his back, <b>snoring.<\/b>", "A <b>gentle buzz.<\/b>", "He <b>rolls over.<\/b>", "<i>(잠깐 멈춤)<\/i> The snoring <b>stops.<\/b>", "And he’s <b>still asleep.<\/b>"], "ko": "어떻게 작동하는지 보여드릴게요. 똑바로 누워 코를 골고 있어요. 살짝 진동. 돌아눕습니다. 코골이가 멈췄어요. 그리고 여전히 자고 있어요."}, {"title": "Easy and effective, every night.", "time": "3:51–4:15", "lines": ["So where do we fit?", "<i>(왼쪽 위)<\/i> CPAP and surgery are <b>effective<\/b>,", "but <b>hard to live with.<\/b>", "<i>(오른쪽 아래)<\/i> Apps and watches are <b>easy<\/b>,", "but they only <b>track<\/b> the problem.", "<i>(오른쪽 위)<\/i> We’re aiming for the <b>top right<\/b>:", "easy enough for <b>every night<\/b>,", "and effective enough <b>to matter.<\/b>"], "ko": "그럼 저희는 어디에 있을까요? 양압기와 수술은 효과는 있지만 견디기 힘들어요. 앱과 워치는 쉽지만 문제를 기록만 해요. 저희는 오른쪽 위를 목표로 해요. 매일 밤 쓸 만큼 쉽고, 의미 있을 만큼 효과적인 곳이요."}, {"title": "Our business model is straightforward.", "time": "4:15–4:38", "lines": ["Our business model is <b>straightforward.<\/b>", "The kit is <b>99,000 won<\/b>, about <b>69 dollars<\/b>,", "with a <b>one-week trial.<\/b>", "Then, <b>4,900 won a month<\/b> for replacement pads.", "With a <b>55 percent gross margin<\/b>,", "<b>the very first sale<\/b> pays back", "the cost of <b>acquiring that customer.<\/b>"], "ko": "비즈니스 모델은 단순해요. 키트는 99,000원, 약 69달러이고, 일주일 체험이 포함돼요. 그다음엔 월 4,900원에 교체용 패드를 받아요. 매출총이익률이 55%라서, 첫 판매만으로 그 고객을 데려오는 데 든 비용을 회수해요."}, {"title": "team", "time": "4:38–5:01", "lines": ["Why me?", "First, I <b>live with this problem.<\/b>", "Second, I <b>build products people actually use<\/b>:", "I built our <b>first prototype<\/b> myself.", "My teams have won <b>five awards<\/b>,", "at <b>MIT, Samsung,<\/b> and in <b>San Francisco.<\/b>", "And a <b>sleep researcher<\/b> has reviewed our design."], "ko": "왜 저일까요? 첫째, 저는 이 문제를 안고 살아요. 둘째, 사람들이 실제로 쓰는 제품을 만들어요. 첫 시제품도 제가 직접 만들었어요. 제 팀들은 MIT, 삼성, 샌프란시스코에서 상을 다섯 번 받았어요. 그리고 수면 연구자가 저희 설계를 검토해 줬어요."}, {"title": "Not a trip. A test.", "time": "5:01–5:25", "lines": ["In Silicon Valley,", "I’ll <b>validate three things.<\/b>", "One: will Americans <b>pay<\/b> for it?", "Two: how do <b>sleep doctors<\/b> see it?", "I’ve already reached out to <b>Stanford and UCSF.<\/b>", "Three: which <b>partners<\/b> can help us sell?", "<i>(심사위원을 보며)<\/i> This is <b>not a trip.<\/b>", "It’s <b>a test.<\/b>"], "ko": "실리콘밸리에서 세 가지를 검증할게요. 하나, 미국인이 돈을 낼까? 둘, 수면 전문의는 어떻게 볼까? 스탠퍼드와 UCSF에는 이미 연락했어요. 셋, 어떤 파트너가 함께 팔아줄까? 이건 여행이 아니라 검증이에요."}, {"title": "Turn over. Sleep easy.", "time": "5:25–5:41", "lines": ["I’m Jefferey Kim,", "and this is <b>AirwayOS.<\/b>", "No one should <b>have to choose<\/b>", "between <b>sleeping well<\/b> and <b>sleeping together.<\/b>", "<i>(한 박자, 천천히)<\/i> <b>Turn over. Sleep easy.<\/b>", "<i>(심사위원을 보며, 웃으면서)<\/i> <b>Sweet dreams.<\/b>", "Thank you."], "ko": "저는 김민재, AirwayOS였습니다. 누구도 잘 자는 것과 함께 자는 것 중 하나를 골라야 해서는 안 돼요. 돌아누우면, 편히 잔다. 달콤한 꿈 꾸세요. 감사합니다."}, {"title": "First customer: back-sleeping snorers in the US.", "time": "APPENDIX", "lines": ["Our first customer is an adult in the US who snores mostly on their back.", "Often their partner pushes them to do something.", "They are not ready for a sleep lab or a CPAP mask; they want something easy tonight.", "Our first target, positional therapy in the US, is about 170 million dollars.", "Thirty million Americans have sleep apnea and 80 percent are undiagnosed, so most of them are not in any market yet."], "ko": ""}, {"title": "$69: low enough to try without a doctor.", "time": "APPENDIX", "lines": ["A prescription device costs 499 dollars.", "69 dollars is low enough to try without a doctor, and we still keep a 55 percent margin.", "In Silicon Valley I will test 69 versus 89 dollars with real people."], "ko": ""}, {"title": "Bigger need in the US. Korea is the test bed.", "time": "APPENDIX", "lines": ["The need is bigger in the US: thirty million people have sleep apnea, and a sleep test costs about three thousand dollars without insurance.", "Korea is our test bed: we build and validate here now, then launch online in the US in 2027, then apply to the FDA, and later Medicare."], "ko": ""}, {"title": "Three tests, one decision.", "time": "APPENDIX", "lines": ["Three tests.", "One: a waitlist page and a survey of 100 people, to see if they pay 69 or 89 dollars.", "Two: interviews with sleep doctors at Stanford and UCSF.", "I have reached out to both and will follow up in person in January.", "Three: meetings with five VCs and three medical equipment suppliers, to find partners.", "If people pay and doctors see value, I keep building.", "If not, I will know why."], "ko": ""}, {"title": "What's built, and what's next.", "time": "APPENDIX", "lines": ["I built version 0.1 myself in October: a phone app that detects snoring and sleeping position.", "A sleep researcher reviewed the design, and the video you saw is a concept video.", "The patch hardware is next, in December, using off-the-shelf sensor and vibration modules first.", "Finding a manufacturing partner is part of what I will test in Silicon Valley."], "ko": ""}, {"title": "Who has reviewed the idea.", "time": "APPENDIX", "lines": ["A sleep researcher at Kyungpook National University Hospital reviewed our design.", "I also consulted a patent attorney to shape the idea.", "In Silicon Valley, sleep doctors at Stanford and UCSF are the next advisors I want."], "ko": ""}, {"title": "Built fast. Pitched to real people.", "time": "APPENDIX", "lines": ["I like to build fast and pitch to real people.", "At MIT Global Startup Workshop, my team placed second with NovaFlow, a crowd-safety app where phones talk without a network.", "At a YC-backed hackathon in San Francisco, I went alone, formed a team on site, built a voice-ordering AI agent, gave the final pitch, and we won third.", "I also won first at the KNU Mobile App Contest and the Grand Prize at a regional AI Workflow Hackathon."], "ko": ""}, {"title": "The key risk: wearing it every night.", "time": "APPENDIX", "lines": ["The biggest risk is whether people keep wearing it every night.", "That is why we start with a one-week test and the softest buzz that works.", "If people stop using it, we will know fast and fix it."], "ko": ""}, {"title": "How we compare.", "time": "APPENDIX", "lines": ["Yes, others exist.", "The tennis ball is cheap and works, but it hurts all night, so fewer than one in ten still use it after two and a half years.", "Snore wristbands don’t know how you’re lying.", "Smart Nora moves your pillow, but it can’t tell how your body is lying.", "The closest is Night Shift: FDA-cleared, and it works, but it costs 499 dollars, needs a prescription, and you only find out if it suits you after you buy it.", "We test you for a week first, for 69 dollars."], "ko": ""}, {"title": "Will people keep paying? What about refunds?", "time": "APPENDIX", "lines": ["They don’t have to pay forever.", "The first sale already pays back our acquisition cost.", "Pads are used up, so the monthly plan has a real reason to stay.", "For refunds, we stay profitable while refunds are under about thirty percent; the free app filters who buys, and returned devices are reused.", "In the US on Amazon, about 35 dollars, roughly half the price, is left before ads."], "ko": ""}, {"title": "Why on the back of the shoulder?", "time": "APPENDIX", "lines": ["You only feel it when you lie on your back; on your side, it stays out of the way.", "It’s one coin-sized device with a motion sensor, a buzz motor, Bluetooth and a battery; the phone does the listening.", "It snaps onto a medical gel pad, and only the pad is replaced.", "Returned devices are cleaned, tested and reused.", "You can put it on by yourself, and it stays put, unlike a chest band that slides around."], "ko": ""}, {"title": "Why not just a smartwatch app?", "time": "APPENDIX", "lines": ["Your wrist doesn’t know which way your body is lying, because your arm moves on its own.", "Clinically tested position trainers are worn on the chest or the back of the neck.", "And watches today screen over weeks; they don’t intervene tonight.", "We see watches as our funnel, not our competitor."], "ko": ""}, {"title": "Won’t the vibration wake people up?", "time": "APPENDIX", "lines": ["Fair concern, and our expert raised it too.", "In a one-month study of vibration position therapy, sleep efficiency did not change significantly and daytime sleepiness dropped.", "Against the tennis-ball technique, people had fewer awakenings.", "And we buzz less often than those devices: only when you snore on your back, weakest first."], "ko": ""}, {"title": "Is this a medical device?", "time": "APPENDIX", "lines": ["Not in phase one.", "We launch as a wellness snoring aid with no medical claims, the way Smart Nora is sold, and the FDA’s 2026 wellness guidance supports that.", "In phase two, with outcome data, we pursue FDA 510(k) clearance using Night Shift as the comparison device.", "It was cleared on a study of just 27 patients.", "Then Medicare billing."], "ko": ""}, {"title": "2026 changed three things.", "time": "APPENDIX", "lines": ["Why now?", "Three things changed in 2026.", "The evidence: the habit lasts.", "The rules: the FDA’s new wellness guidance treats sleep trackers like ours as low-risk, so we can launch fast.", "And the demand: Samsung and Apple watches now warn people about sleep apnea, with nothing to do next.", "We are the next step."], "ko": ""}, {"title": "Can’t someone just copy this?", "time": "APPENDIX", "lines": ["Honestly, the basic idea of buzzing on your back has prior art, and there is an existing patent that combines sound and motion.", "So our moat isn’t one patent.", "It’s nightly data that improves our personal model, clinical proof from a sleep-center study, a filing on our specific control logic, and a price that lets people start for free."], "ko": ""}, {"title": "The patch is only the beginning.", "time": "APPENDIX", "lines": ["The patch is only the beginning.", "The same software can run on a watch, a pillow, or a CPAP machine.", "That’s why it’s called AirwayOS."], "ko": ""}]</script>
+<script>
+(() => {
+const D = JSON.parse(document.getElementById('pdata').textContent);
+const N = D.length; let cur = -1, remote = false, digits = '', t0 = null;
+const nowS = [...document.querySelector('#tbNow .stage').children], nextS = [...document.querySelector('#tbNext .stage').children];
+nowS.forEach((s,i)=>{ const pg=s.querySelector('div.pg'); if(pg) pg.dataset.n=i+1; }); nextS.forEach((s,i)=>{ const pg=s.querySelector('div.pg'); if(pg) pg.dataset.n=i+1; });
+const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('airwayos-sync') : null;
+function fit() { document.querySelectorAll('.tb').forEach(tb => { tb.querySelector('.stage').style.transform = 'scale(' + (tb.clientWidth/1920) + ')'; }); }
+addEventListener('resize', fit);
+let fs = parseInt(localStorage.getItem('airwayos-fs') || '0', 10) || Math.round(Math.max(28, Math.min(60, innerWidth/34)));
+function setFs(v) { fs = Math.max(22, Math.min(90, v)); document.documentElement.style.setProperty('--fs', fs + 'px'); try { localStorage.setItem('airwayos-fs', fs); } catch(e) {} }
+setFs(fs);
+function show(i) {
+  i = Math.max(0, Math.min(N-1, i)); if (i === cur) return; cur = i;
+  const d = D[i];
+  document.getElementById('num').textContent = (i+1) + ' / ' + N;
+  document.getElementById('ttl').textContent = d.title;
+  document.getElementById('tm').textContent = d.time;
+  document.getElementById('script').innerHTML = d.lines.map(l => '<p class="l">' + l + '</p>').join('') + (d.ko ? '<p class="ko">' + d.ko + '</p>' : '');
+  document.getElementById('script').scrollTop = 0; document.getElementById('script').classList.toggle('long', d.lines.join(' ').length > 280);
+  nowS.forEach((s,k) => s.classList.toggle('on', k === i));
+  nextS.forEach((s,k) => s.classList.toggle('on', k === i+1));
+  history.replaceState(null, '', '#' + (i+1));
+  if (t0 === null && i > 0) t0 = Date.now();
+  if (!remote) { try { bc && bc.postMessage({ i, from: 'presenter' }); } catch(e) {} try { localStorage.setItem('airwayos-slide', JSON.stringify({ i, t: Date.now(), from: 'presenter' })); } catch(e) {} }
+}
+function follow(d) { if (!d || d.from === 'presenter' || typeof d.i !== 'number') return; remote = true; show(d.i); remote = false; }
+if (bc) bc.onmessage = e => follow(e.data);
+addEventListener('storage', e => { if (e.key === 'airwayos-slide' && e.newValue) { try { follow(JSON.parse(e.newValue)); } catch(x) {} } });
+setInterval(() => { const s = t0 === null ? 0 : Math.floor((Date.now()-t0)/1000); document.getElementById('timer').textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); document.getElementById('timer').style.color = s >= 420 ? '#FF6A55' : (s >= 360 ? '#FFB86B' : '#f5f5f7'); }, 500);
+const gotoEl = document.getElementById('goto');
+addEventListener('keydown', e => {
+  const k = e.key;
+  if (/^[0-9]$/.test(k)) { digits += k; gotoEl.textContent = 'Go to ' + digits; gotoEl.style.display = 'block'; return; }
+  if (k === 'Enter' && digits) { show(parseInt(digits,10)-1); digits=''; gotoEl.style.display='none'; return; }
+  if (k === 'Escape') { digits=''; gotoEl.style.display='none'; return; }
+  if (['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)) { e.preventDefault(); show(cur+1); }
+  else if (['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)) { e.preventDefault(); show(cur-1); }
+  else if (k === 't' || k === 'T') { t0 = Date.now(); }
+  else if (k === '+' || k === '=') setFs(fs + 4); else if (k === '-' || k === '_') setFs(fs - 4);
+  else if (k === 'k' || k === 'K') document.body.classList.toggle('showko');
+  else if (k === 'Home') show(0); else if (k === 'End') show(N-1);
+});
+const h = parseInt((location.hash||'').slice(1), 10); show(isNaN(h) ? 0 : h-1); fit(); setTimeout(fit, 300);
+})();
+</script></body></html>
