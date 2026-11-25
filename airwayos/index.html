@@ -35,12 +35,17 @@ body.shownotes #notes { display: block }
 #start p { font: 18px/1.7 'JetBrains Mono', monospace; color: #8e8e93; text-align: center }
 body.started #start { display: none }
 #goto { position: fixed; right: 24px; bottom: 20px; z-index: 45; font: 700 28px 'JetBrains Mono', monospace; color: #6CB4FF; background: rgba(0,0,0,.7); padding: 6px 14px; border-radius: 10px; display: none }
+.cue { position: absolute; left: 0; right: 0; bottom: 0; z-index: 30; padding: 34px 110px 24px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px; background: linear-gradient(to top, rgba(6,7,10,.94) 0%, rgba(6,7,10,.86) 62%, rgba(6,7,10,0) 100%); font: 500 27px/1.3 'Inter', sans-serif; color: rgba(245,245,247,.9); letter-spacing: -.2px; pointer-events: none; text-align: center }
+.cue span { white-space: nowrap }
+.cue b { color: #8EC5FF; font-weight: 700 }
+.cue i { font-style: normal; color: #6CB4FF; opacity: .75; font-weight: 400 }
+body.nocue .cue { display: none }
 #tap { position: fixed; z-index: 45; left: 50%; top: 50%; transform: translate(-50%,-50%); font: 700 24px 'Inter', sans-serif; color: #fff; background: rgba(0,0,0,.75); padding: 16px 28px; border-radius: 999px; display: none }
 </style>
 <link rel="stylesheet" href="deck.css">
 </head><body>
 <div id="start"><h1>AirwayOS</h1><button id="startbtn">▶&nbsp;&nbsp;Start presentation</button>
-<p>→ / Space / click : next &nbsp;·&nbsp; ← / right-click : back<br>F : fullscreen &nbsp;·&nbsp; N : notes &nbsp;·&nbsp; B : black screen &nbsp;·&nbsp; number + Enter : go to slide</p></div>
+<p>→ / Space / click : next &nbsp;·&nbsp; ← / right-click : back<br>F : fullscreen &nbsp;·&nbsp; N : notes &nbsp;·&nbsp; C : cue line on/off &nbsp;·&nbsp; B : black screen &nbsp;·&nbsp; number + Enter : go to slide</p></div>
 <div id="stage">
 <section id="cover" class="night" data-transition="fade" style="padding:0px; position:relative">
 <img src="assets/13d0bb2cba8efdf26457d4ba1dcf59b4.png" alt="Concept render: the thin round white wearable in front of a tilted phone showing the AirwayOS morning report, on a dark background." style="display:block; width:1920px; height:1080px; object-fit:cover">
@@ -51,7 +56,7 @@ body.started #start { display: none }
 <p class="rise" style="--i:2; position:absolute; left:128px; top:500px; width:980px; margin:0; font-size:64px; font-weight:700; letter-spacing:-1.5px; line-height:1.15; color:#F5F5F7">Turn over. <span style="color:#6CB4FF">Sleep easy.</span></p>
 <p style="position:absolute; left:128px; top:640px; width:900px; margin:0; font-size:30px; line-height:1.3; color:#A8A8AE">Minjae Kim</p>
 
-</section>
+<div class="cue"><span>Good afternoon · I’m Minjae Kim, founder</span><span><i>→</i> Sweet dreams</span><span><i>→</i> Everyone wants sweet dreams</span><span><i>→</i> But for millions… <b>the night sounds like this</b></span></div></section>
 <section id="hook" class="night" data-transition="fade" style="padding:0px; position:relative">
 <video class=" slide-video" style="display:block; width:1920px; height:1080px; object-fit:cover" poster="assets/bb722172c076a1e4d2cbca4b7a4666ca.jpg" src="assets/0af6626be2547ff0e33f3a098e051222.mp4" preload="auto" playsinline data-sound="on" aria-label="A woman glares at her partner snoring in bed at night. A sound graph grows across the room: three snores, a long flat silence, then a sudden gasp."></video>
 <div style="position:absolute; right:72px; bottom:52px; width:300px; height:44px; display:flex; align-items:center; justify-content:flex-end; gap:12px; opacity:0.9"><img src="assets/a3980751247bb381aa5a1e7877397e57.png" alt="AirwayOS logo" style="width:52px; height:34px"><p style="margin:0; font-size:28px; font-weight:800; letter-spacing:-0.5px; color:#F5F5F7">AirwayOS</p></div>
@@ -70,7 +75,7 @@ body.started #start { display: none }
 <p class="lead fade" style="--d:2300ms; position:absolute; left:128px; top:856px; width:1200px; color:#F5F5F7">Again and again, all night.</p>
 <div class="pg" data-n="3"></div>
 
-</section>
+<div class="cue"><span>A man who <b>stopped breathing</b></span><span><i>→</i> Snoring → silence → gasp</span><span><i>→</i> Again and again, all night</span><span><i>→</i> <b>I snore, too</b></span><span><i>→</i> A phone can recognize this</span></div></section>
 <section id="danger" class="night" data-transition="fade" style="padding:0px; position:relative">
 <img src="assets/c1083613bfacd1acf42deac3624a5d16.jpg" alt="Three panels: a brain scan with a marked lesion, a tired man at the wheel at night, and a crashed car at a roadside." style="display:block; width:1920px; height:1080px; object-fit:cover">
 <p style="position:absolute; left:72px; top:56px; margin:0; font-size:88px; font-weight:900; letter-spacing:-1px; line-height:1.1; color:#F5F5F7">IT’S NOT JUST <span style="background:#E4F07A; color:#141417; padding:0px 18px">NOISE</span></p>
@@ -90,7 +95,7 @@ body.started #start { display: none }
 <p style="margin:10px 0 0 0; font-size:30px; line-height:1.3; color:#C7C7CC">crashes a year with a drowsy driver, one every 6 minutes</p>
 </div>
 
-</section>
+<div class="cue"><span>Not just noise — <b>a health risk</b></span><span><i>→</i> Stroke <b>×2</b></span><span><i>→</i> Car crash <b>×2+</b></span><span><i>→</i> US: drowsy-driver crash every <b>6 min</b></span></div></section>
 <section id="scale" class="night" data-transition="fade" style="padding:0px; position:relative">
 <img src="assets/78b8e167c407a43f113e4dd8a0beb356.jpg" alt="World map centered on the Americas, other continents faint. The United States is covered in 150 dots, each 200,000 people with sleep apnea. Only one dot in five is lit; the rest are dark." style="display:block; width:1920px; height:1080px; object-fit:cover">
 <div style="position:absolute; left:72px; top:700px; width:900px">
@@ -104,7 +109,7 @@ body.started #start { display: none }
 <div><p style="margin:0; font-size:96px; font-weight:800; letter-spacing:-3px; line-height:1.0; color:#E4F07A">$170M</p><p style="margin:14px 0 0 0; font-size:18px; font-weight:600; letter-spacing:4px; line-height:1.4; color:#C7C7CC">US POSITIONAL<br>THERAPY MARKET</p></div>
 </div>
 
-</section>
+<div class="cue"><span>Far more common</span><span><i>→</i> <b>30M</b> Americans · <b>80%</b> never diagnosed</span><span><i>→</i> <b>29%</b> sleep apart</span><span><i>→</i> First target: US positional therapy <b>$170M</b></span></div></section>
 <section id="measure" class="night" data-transition="magic" style="padding:0px; position:relative">
 <img src="assets/38b89c7cb9daad99185b8cfd2a402984.jpg" alt="A woman asleep in a sleep lab, wires taped to her face and head, a recorder on the bed beside her." style="display:block; width:1920px; height:1080px; object-fit:cover">
 <div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
@@ -129,7 +134,7 @@ body.started #start { display: none }
 </div>
 <div class="pg" data-n="6"></div>
 
-</section>
+<div class="cue"><span>Why don’t people get help?</span><span><i>→</i> Barrier 1: <b>diagnosis</b></span><span><i>→</i> Sleep lab, covered in wires</span><span><i>→</i> <b>~$3,000</b> without insurance</span><span><i>→</i> One night: wrong for up to <b>half</b></span></div></section>
 <section id="prevent" class="night foot" data-transition="magic">
 <div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
 <div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
@@ -151,7 +156,7 @@ body.started #start { display: none }
 </div>
 <div class="pg" data-n="7"></div>
 
-</section>
+<div class="cue"><span>Barrier 2: <b>treatment</b></span><span><i>→</i> CPAP mask, every single night</span><span><i>→</i> <b>$600+</b> · <b>1 in 3</b> don’t use it enough</span><span><i>→</i> Surgery? <b>$30,000+</b></span></div></section>
 <section id="position" class="night foot" data-transition="magic">
 <div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
 <div id="fl-t2" class="fl-track" style="left:1016px; width:552px"></div>
@@ -186,7 +191,7 @@ body.started #start { display: none }
 <p style="margin:30px 0 0 0; font-size:40px; font-weight:700; letter-spacing:-0.5px; line-height:1.2; color:#F5F5F7">But no one controls how they lie in their sleep.</p>
 <div class="pg" data-n="8"></div>
 
-</section>
+<div class="cue"><span>But here’s the <b>good news</b></span><span><i>→</i> More than half: <b>how they sleep</b></span><span><i>→</i> Back → tongue blocks the airway</span><span><i>→</i> Side → airway stays open</span><span><i>→</i> The catch? <b>Can’t control it asleep</b></span></div></section>
 <section id="turn" class="night" data-transition="fade" style="padding:0px; position:relative">
 <img src="assets/9dc25377728f1ca6f276ec11cd5d4d19.png" alt="Concept render: a thin, round white wearable with a small blue light, on a clear round skin patch, lit dramatically on a dark background." style="display:block; width:1920px; height:1080px; object-fit:cover">
 <div id="fl-t1" class="fl-track" style="left:350px; width:498px"></div>
@@ -213,7 +218,7 @@ body.started #start { display: none }
 <div class="spec"><svg width="44" height="44" viewBox="0 0 44 44" aria-label="learning loop icon"><path d="M34 16a13 13 0 1 0 2 9" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 8v8h-8" stroke="#6CB4FF" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><div><p class="spk">LEARNS YOU</p><p class="spc">SOFTEST BUZZ THAT WORKS</p></div></div>
 </div>
 
-</section>
+<div class="cue"><span>So we built this: <b>a thin shoulder patch</b></span><span><i>→</i> Phone hears snoring</span><span><i>→</i> Patch senses your back</span><span><i>→</i> Both — <b>only then</b> — a gentle buzz</span><span><i>→</i> Roll over, keep sleeping</span></div></section>
 <section id="learns" class="night foot" data-transition="fade">
 <img src="assets/6a381d5c2439d937c87b95c9b4603dc9.png" alt="" style="position:absolute; left:1100px; top:0px; width:820px; height:1080px">
 <p class="eyebrow">NEW VALUE</p>
@@ -229,7 +234,7 @@ body.started #start { display: none }
 </div>
 <div class="pg" data-n="10"></div>
 
-</section>
+<div class="cue"><span>It <b>learns you</b></span><span><i>→</i> Week 1: only measures · baseline</span><span><i>→</i> Week 2+: <b>softest buzz</b> that works</span><span><i>→</i> Watches report <b>tomorrow</b> → we act <b>tonight</b></span></div></section>
 <section id="demo" class="night foot" data-transition="fade">
 <p class="eyebrow">DEMO</p>
 <h2 class="t" style="margin:0 0 40px 0">One night, one soft buzz.</h2>
@@ -245,7 +250,7 @@ body.started #start { display: none }
 </div>
 <div class="pg" data-n="11"></div>
 
-</section>
+<div class="cue"><span>Let me show you how it works</span><span><i>→</i> On his back, snoring</span><span><i>→</i> Gentle buzz</span><span><i>→</i> Rolls over</span><span><i>→</i> Snoring stops · <b>still asleep</b></span></div></section>
 <section id="compete" class="night foot" data-transition="fade">
 <p class="eyebrow">COMPETITIVE ADVANTAGE</p>
 <h2 class="t" style="margin:0 0 40px 0">Easy and effective, every night.</h2>
@@ -267,7 +272,7 @@ body.started #start { display: none }
 </div>
 <div class="pg" data-n="12"></div>
 
-</section>
+<div class="cue"><span>So where do we fit?</span><span><i>→</i> CPAP & surgery: effective, <b>hard to live with</b></span><span><i>→</i> Apps & watches: easy, <b>only track</b></span><span><i>→</i> Top right: <b>easy every night + effective</b></span></div></section>
 <section id="model" class="night foot" data-transition="fade">
 <p class="eyebrow">BUSINESS MODEL</p>
 <h2 class="t" style="margin:0 0 40px 0">₩99,000 kit. Pays back on the first sale.</h2>
@@ -306,7 +311,7 @@ body.started #start { display: none }
 </div>
 <div class="pg" data-n="13"></div>
 
-</section>
+<div class="cue"><span>Straightforward</span><span><i>→</i> Kit <b>₩99,000</b> (~$69) + 1-week trial</span><span><i>→</i> <b>₩4,900</b>/month pads</span><span><i>→</i> <b>55%</b> gross margin → first sale pays back CAC</span></div></section>
 <section id="team" class="night" data-transition="fade" style="padding:0px; position:relative">
 <img src="assets/52fb4ccf1f563e7bfe0ec479efceac2a.jpg" alt="Minjae Kim pitching on stage at MIT Global Startup Workshop 2026." style="display:block; width:1920px; height:1080px; object-fit:cover">
 <p style="position:absolute;left:128px;top:100px;width:600px;margin:0;font-weight:700;letter-spacing:4px;color:#E4F07A;font-size:30px">WHY ME</p>
@@ -333,7 +338,7 @@ body.started #start { display: none }
 <div style="display:flex; flex-direction:column; align-items:center; text-align:center"><svg width="40" height="40" viewBox="0 0 40 40" aria-label="graduation cap icon"><path d="M3 15 20 8l17 7-17 7zM10 18v8c3 3 17 3 20 0v-8M35 16v9" fill="none" stroke="#E4F07A" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="height:62px; display:flex; flex-direction:column; justify-content:flex-end; margin-top:10px"><p style="margin:0; font-size:26px; font-weight:800; line-height:1.15; color:#F5F5F7">UC BERKELEY</p></div><p style="margin:8px 0 0 0; font-family:'JetBrains Mono', monospace; font-size:24px; letter-spacing:1px; line-height:1.2; color:#A8A8AE">SUMMER 2026</p></div>
 </div>
 
-</section>
+<div class="cue"><span>Why me?</span><span><i>→</i> 1 · I <b>live with this problem</b></span><span><i>→</i> 2 · I build what people use · prototype myself</span><span><i>→</i> <b>5 awards</b>: MIT · Samsung · SF</span><span><i>→</i> Sleep researcher</span></div></section>
 <section id="sv" class="night foot" data-transition="fade" style="padding:0px; position:relative">
 <img src="assets/69895ad92e928ca3d58c5f10ebeb0bbc.jpg" alt="Dotted map of the San Francisco Bay Area, with San Francisco and Stanford lit in blue." style="display:block; width:1920px; height:1080px; object-fit:cover">
 <p class="eyebrow" style="position:absolute; left:128px; top:128px; width:900px; margin:0">IN SILICON VALLEY · JANUARY 2027</p>
@@ -361,7 +366,7 @@ body.started #start { display: none }
 <p class="rdl" style="left:1492px; width:280px; text-align:right">MEDICARE</p>
 <div class="pg" data-n="15"></div>
 
-</section>
+<div class="cue"><span><b>Validate 3 things</b></span><span><i>→</i> 1 · Will Americans <b>pay</b>?</span><span><i>→</i> 2 · Doctors: <b>Stanford & UCSF</b></span><span><i>→</i> 3 · <b>Partners</b></span><span><i>→</i> <b>Not a trip. A test.</b></span></div></section>
 <section id="close" class="night" data-transition="fade" style="padding:0px; position:relative">
 <img src="assets/db1482350e6b812cde4dcf14d8e4c796.jpg" alt="Illustration: a person sleeps peacefully on their side under a starry night sky, a small patch on their upper back." style="display:block; width:1920px; height:1080px; object-fit:cover">
 <div class="rise" style="--i:0; position:absolute; left:128px; top:236px; width:600px; display:flex; align-items:center; gap:16px">
@@ -371,7 +376,7 @@ body.started #start { display: none }
 <p class="rise" style="--i:1; position:absolute; left:128px; top:330px; width:900px; margin:0; font-size:120px; font-weight:800; letter-spacing:-4px; line-height:1.02; color:#F5F5F7">Turn over.<br><span style="color:#6CB4FF">Sleep easy.</span></p>
 <p class="rise" style="--i:2; position:absolute; left:128px; top:620px; width:760px; margin:0; font-size:34px; line-height:1.35; color:#D0D2E0">No one should have to choose between sleeping well and sleeping together.</p>
 
-</section>
+<div class="cue"><span>I’m Minjae Kim — this is AirwayOS</span><span><i>→</i> No one should have to choose:</span><span><i>→</i> <b>sleeping well</b> & <b>sleeping together</b></span><span><i>→</i> Turn over. Sleep easy.</span><span><i>→</i> <b>Sweet dreams</b> · Thank you</span></div></section>
 <section id="competition" class="night foot" data-transition="fade">
 <p class="eyebrow">APPENDIX · Q&amp;A</p>
 <h2 class="t">How we compare.</h2>
@@ -552,6 +557,7 @@ addEventListener('keydown', e => {
   else if (k === 'Home') go(0); else if (k === 'End') go(slides.length - 1);
   else if (k === 'f' || k === 'F') fs();
   else if (k === 'n' || k === 'N') document.body.classList.toggle('shownotes');
+  else if (k === 'c' || k === 'C') document.body.classList.toggle('nocue');
   else if (k === 'b' || k === 'B' || k === '.') document.body.classList.toggle('blackout');
 });
 document.addEventListener('click', e => { if (!document.body.classList.contains('started')) return; if (document.body.classList.contains('blackout')) { document.body.classList.remove('blackout'); return; } next(); });
