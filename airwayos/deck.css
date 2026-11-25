@@ -296,3 +296,10 @@ p.dml2.ok { color:#6CB4FF; }
 /* v7 ko gloss */
 ruby { ruby-position: under; ruby-align: center; }
 rt { font-family: 'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR','Noto Sans CJK KR',sans-serif; font-size: max(0.3em, 13px); font-weight: 500; font-style: normal; letter-spacing: 0; text-transform: none; line-height: 1; opacity: .55; padding-top: 1px; }
+
+/* v7.1 slide 9 steps */
+.steps9 { display:flex; flex-direction:column; }
+.st9 { display:flex; gap:20px; align-items:center; padding:16px 0; border-bottom:1px solid #34363C; }
+.st9n { margin:0; width:28px; font-family:'JetBrains Mono', monospace; font-size:26px; font-weight:500; color:#6CB4FF; }
+.st9t { margin:0; font-size:34px; font-weight:500; line-height:1.2; color:#C7C7CC; }
+.st9t b { color:#F5F5F7; font-weight:700; }
